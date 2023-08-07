@@ -20,7 +20,7 @@ OBJ_FILES:=$(patsubst $(SRC_DIR)/%.c,$(BUILD_DIR)/%.o,$(SRC_FILES))
 # Target executable
 TARGET:=application
 ARGV:=10 30
-MODE?=debug
+MODE?=release
 
 PROFILE_FLAGS:=-pg
 RELEASE_FLAGS:=-O3
