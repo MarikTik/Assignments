@@ -10,9 +10,4 @@ void menu_quit(void);
 #endif
 
 
-// "Add Employee",
-// 	"Print Employee",
-// 	"Print All Employees",
-// 	"Edit Employee",
-// 	"Quit"
-
+ 

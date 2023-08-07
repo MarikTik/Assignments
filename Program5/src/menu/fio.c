@@ -1,5 +1,8 @@
 #include "fio.h"
 #include <stdio.h>
+
+#define PATH_SIZE 100
+
 static char path[PATH_SIZE];
  
 void save_file_create(){
