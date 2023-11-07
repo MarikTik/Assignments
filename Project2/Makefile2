@@ -1,0 +1,46 @@
+CXX:=g++
+CXXFLAGS:=--std=c++17
+
+DEBUG_FLAGS:=-g -O0 -DDEBUG
+RELEASE_FLAGS:=-O2 -DNDEBUG
+MODE?=debug
+
+TARGET:=app
+ARGS?=
+
+BIN:=bin
+OBJ=$(BIN)/obj
+
+SOURCES:=submission.cpp
+OBJECTS:=$(SOURCES:.cpp=.o)
+
+ifeq ($(MODE),release)
+CXXFLAGS+=$(RELEASE_FLAGS)
+BIN:=$(BIN)/release
+else ifeq ($(MODE),debug)
+BIN:=$(BIN)/debug
+CXXFLAGS+= $(DEBUG_FLAGS)
+endif
+
+all: build run
+
+
+$(TARGET): $(OBJECTS)
+	$(CXX) $(OBJ)/$^ -o $(BIN)/$@
+
+%.o: %.cpp
+	$(CXX) $(CXXFLAGS) -c $^ -o $(OBJ)/$@
+
+build: prepare $(TARGET)
+
+run: 
+	./$(BIN)/$(TARGET) $(ARGS)
+
+debug:
+	gdb --args ./$(BIN)/$(TARGET) $(ARGS)
+clean:
+	[ -e bin ] && rm -r bin	
+ 
+
+prepare:
+	mkdir -p $(OBJ)
