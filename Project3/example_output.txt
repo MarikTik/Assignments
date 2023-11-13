@@ -1,0 +1,12 @@
+Kevin is taller than Stuart
+
+The minion Stuart is 25.5 inches tall, has 1 eye(s), and owns 4 banana(s).
+Stuart getting bananas.
+The minion now has 6 banana(s).
+
+The minion Bob is 23.8 inches tall, has 2 eye(s), and owns 0 banana(s).
+Bob getting bananas.
+Before getting bananas, the minion had 0 banana(s).
+After getting bananas, the minion has 1 banana(s).
+
+3 minions created.
