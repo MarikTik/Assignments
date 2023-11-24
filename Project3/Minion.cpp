@@ -53,12 +53,12 @@ const Minion Minion::input_minion_const(istream &is)
      return minion;
 }
 
-ostream &operator<<(ostream &os, Minion &minion)
+ostream &operator<<(ostream &os, const Minion &minion)
 {
      os << "The minion " << minion.name << " is " << minion.height << 
      " tall, has " << minion.eyes << " eye(s), and owns " <<
      minion.bananasOwned << " banana(s).\n"; 
-
+ 
      return os;
 }
 

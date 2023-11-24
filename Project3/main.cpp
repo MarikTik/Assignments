@@ -6,7 +6,7 @@ using namespace std;
 
 int main(){
 
-     //ofstream output_stream("")
+ 
      ifstream input_stream("minion.txt");
 
      const Minion minion1 = Minion::input_minion_const(input_stream);
