@@ -1,5 +1,4 @@
 from approximation_methods import *
-from decimal import Decimal, getcontext
 
 
 def error(approx: float, actual: float) -> float:
@@ -23,12 +22,12 @@ def question_4() -> None:
      }
 
      def print_row(description: str, result: float, error: float, relative_error: float):
-          print(f"{description:<30} | {result:<20} | {error:<20} | {relative_error}")
+          print(f"{description:<28} | {result:<20} | {error:<20} | {relative_error}")
 
      def print_separator(length: int):
           print("-" * length)
 
-     table_header = "Approximation Method:     | Approximation result | Error                | Relative error"
+     table_header = "Approximation Method:        | Approximation result | Error                | Relative error"
 
      def print_table():
           print_separator(len(table_header))
@@ -39,11 +38,16 @@ def question_4() -> None:
           print_separator(len(table_header))
      
      print_table()
-  
+
+def question5():
+
+     pass
 
 if __name__ == "__main__":
-     getcontext().prec = 20
+     print ("Homework 5 By Mark Tikhonov\n\n\n")
+     print("4.\n\n")
      question_4()
+     print("\n\n5.\n\n")
  
  
 
