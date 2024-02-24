@@ -1,3 +1,4 @@
 from .left_hand_rule import left_hand_approximation
 from .right_hand_rule import right_hand_approximation
 from .mid_point_rule import mid_point_approximation
+from .simpsons_rule import simpsons_approximation
