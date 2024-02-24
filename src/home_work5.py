@@ -15,19 +15,19 @@ def question_4() -> None:
 
      # Assuming f, a, b, and n are defined earlier in your code
      approximations = {
-          "Left hand approximation": left_hand_approximation(f, a, b, n),
-          "Mid point approximation": mid_point_approximation(f, a, b, n),
-          "Right hand approximation": right_hand_approximation(f, a, b, n),
-          "Simpson's rule approximation": simpsons_approximation(f, a, b, n)
+          "L_(6)": left_hand_approximation(f, a, b, n),
+          "M_(6)": mid_point_approximation(f, a, b, n),
+          "R_(6)": right_hand_approximation(f, a, b, n),
+          "S_(6)": simpsons_approximation(f, a, b, n)
      }
 
      def print_row(description: str, result: float, error: float, relative_error: float):
-          print(f"{description:<28} | {result:<20} | {error:<20} | {relative_error}")
+          print(f"{description:<21} | {result:<20} | {error:<20} | {relative_error}")
 
      def print_separator(length: int):
           print("-" * length)
 
-     table_header = "Approximation Method:        | Approximation result | Error                | Relative error"
+     table_header = "Approximation Method: | Approximation result | Error                | Relative error"
 
      def print_table():
           print_separator(len(table_header))
