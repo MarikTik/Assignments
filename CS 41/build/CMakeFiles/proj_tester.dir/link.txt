@@ -1,0 +1,1 @@
+/usr/bin/c++ -g CMakeFiles/proj_tester.dir/week3/project1/src/Program1MarkTikhonov.cpp.o CMakeFiles/proj_tester.dir/week3/project1/src/reverse_polish_expression.cpp.o -o proj_tester 

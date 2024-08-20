@@ -1,0 +1,16 @@
+the reason that la translates into 2 commands is that when loading an adress which is 32 bits long, it is impossible to
+use lui only since it expects a 16 bit immediate value. Because of this lui is used to load the "known" half of the adress
+which is tipically 0x00001001 which leaves another 16 bit zeroed. At this point ori command is used to add the remaing 16 bytes.
+It is also important to note that this is enabled because lui is "load upper immediate" which puts the value at the left handside 
+of the 32 bits (the more significant ones) while ori applies only to the second part of the word-sized register (the least significant one). 
+That is because ori as an I-type command expects 16 bits for the "immediate" field, so we get a guarantee that it will always work like this.
+
+as opposed to la, lw needs to load data from a given adress, this means that it's not enough to just calculate the adress but rather
+access data at a given adress, more specifically at an offset from a given adress. When I see the translation of lw in MARS I notice that the 
+initial command is putting the beginning of .data adress frame into a register $at. This is somewhat simillar to what la does but the adress is put
+into another "intermediate" register. Next the command calls lw register, (offset)($at) which actually loads the word-sized data from the location
+in static data frame with a given offset. Somewhat simillar to how array index accessing is done in C/C++ - we can always substitute 
+arr[i] by *(arr + i), in this case the internal call to lw "dereferences" the value at the given address. 
+
+So to wrap it up, both commands are simillar since they use lui operand as their initia step but their further implementation differs significantly.
+while 'la' computes the correct adress, 'lw' access the value at a given adress.

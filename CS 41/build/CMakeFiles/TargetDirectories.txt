@@ -1,0 +1,3 @@
+/home/mark/Desktop/Assignments/CS 41/build/CMakeFiles/proj_tester.dir
+/home/mark/Desktop/Assignments/CS 41/build/CMakeFiles/edit_cache.dir
+/home/mark/Desktop/Assignments/CS 41/build/CMakeFiles/rebuild_cache.dir
