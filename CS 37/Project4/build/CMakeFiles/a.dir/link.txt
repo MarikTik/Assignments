@@ -1,1 +1,0 @@
-/usr/bin/g++ -g CMakeFiles/a.dir/main.cpp.o CMakeFiles/a.dir/DeliveryOrder.cpp.o CMakeFiles/a.dir/BobaOrder.cpp.o CMakeFiles/a.dir/FoodOrder.cpp.o CMakeFiles/a.dir/Account.cpp.o -o a 

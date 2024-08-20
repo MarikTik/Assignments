@@ -2,7 +2,6 @@
 #define REVERSE_POLISH_EXPRESSION_HPP_
 #include <string>
 #include <istream>
-#include <sstream>
 #include "stack.hpp"
 
 class reverse_polish_expression{

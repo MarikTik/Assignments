@@ -7,7 +7,7 @@ int main(){
      
      while (true){
           try{
-               reverse_polish_expression expression; // the object shouldn't be reused, as the stack may not be cleared if exception occurs
+               reverse_polish_expression expression; // the object shouldn't be reused, as the inner stack object may not be cleared if exception occurs
                std::cin >> expression;
                std::cout << "result = " << expression.result() << "\n";
           }
@@ -18,7 +18,3 @@ int main(){
      }
     
 }
-
-// 10 0 / =
-// 10 20 * / = Error: Too many operators
-// 12 20 30 / = Error: Too many operands
