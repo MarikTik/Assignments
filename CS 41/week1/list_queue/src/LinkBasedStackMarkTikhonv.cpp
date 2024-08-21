@@ -21,7 +21,7 @@ class stack{
           }
           T pop(){
                if (is_empty())
-                    std::underflow_error("attempted to pop an element from stack, but it is empty");
+                    throw std::underflow_error("attempted to pop an element from stack, but it is empty");
 
                T value = _top->data;
                auto ptr = _top;
