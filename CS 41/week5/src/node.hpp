@@ -3,7 +3,7 @@
 
 template<typename T>
 struct node{
-     node(T value, node<T>) : data(value)
+     node(T value) : data(value)
      {
            
      }
