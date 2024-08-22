@@ -1,8 +1,41 @@
-#ifndef SORTED_LIST_HPP_
-#define SORTED_LIST_HPP_
-#include "node.hpp"
-#include <functional>
+#include <iostream>
+#include <string>
+#include <istream>
 #include <ostream>
+#include <functional>
+ 
+template<typename T>
+struct node{
+     node(T value) : data(value)
+     {
+           
+     }
+     T data;
+     node<T> *next = nullptr;
+     node<T> *previous = nullptr;
+};
+
+
+struct person{
+     friend std::istream &operator >> (std::istream &is, person &person);
+     friend std::ostream &operator << (std::ostream &os, const person &person);
+
+     std::string name;
+     float weight;
+};
+
+std::istream &operator>>(std::istream &is, person &person)
+{
+     is >> person.name >> person.weight;
+     return is;
+}
+
+std::ostream &operator<<(std::ostream &os, const person &person)
+{
+     os << person.name << " - " << person.weight;
+     return os;
+}
+
 
 // this implementation of linked list uses doubly linked list, as required by the assignment
 template<typename T>
@@ -80,6 +113,36 @@ class sorted_list{
           comparator_t _comparator;
           size_t _size = 0;
 };
+ 
+static const auto weight_comparator = [](const person &person1, const person &person2){
+     return person1.weight < person2.weight;
+};
+
+static const auto name_length_comparator = [](const person &person1, const person &person2){
+     return person1.name.size() < person2.name.size();
+};
+
+template <size_t persons_n = 15>
+class application{
+     public:
+
+          void run(){
+               for (size_t i = 0; i < persons_n; i++){
+                    person person;
+                    std::cin >> person;
+                    _list_sorded_by_name_length.insert(person);
+                    _list_sorted_by_weights.insert(person);
+               }
+               std::cout << "Names & weights sorted(ascending) by name. : " << _list_sorded_by_name_length;
+               std::cout << "\nNames & weights sorted(ascending) by weight. : " << _list_sorted_by_weights;
+          }
+     private:
+          sorted_list<person> _list_sorted_by_weights{weight_comparator};
+          sorted_list<person> _list_sorded_by_name_length{name_length_comparator};
+};
 
 
-#endif
+int main(){
+     application app;
+     app.run();
+}
