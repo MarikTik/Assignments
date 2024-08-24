@@ -33,7 +33,7 @@ class binary_tree{
 
 int main(){
      binary_tree<int, 100> tree;
-     
+
      for (int i = 0; i < 100; i ++)
           tree.add(i);
 
