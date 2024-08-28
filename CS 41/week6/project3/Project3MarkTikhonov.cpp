@@ -1,9 +1,38 @@
-#ifndef BINARY_SEARCH_TREE_HPP_
-#define BINARY_SEARCH_TREE_HPP_
-#include "tree_node.hpp"
+#include <iostream>
+#include <string>
 #include <type_traits>
 #include <functional>
 #include <optional>
+
+struct person{
+     std::string name;
+     float weight;
+     
+     bool operator < (const person &other){
+          return name < other.name;
+     }
+     friend std::ostream &operator << (std::ostream &os, const person &p){
+          os << "{" << p.name << ", " << p.weight << "}"; 
+          return os;
+     }
+     friend std::istream &operator >> (std::istream &is, person &p){
+          is >> p.name >> p.weight;
+          return is;
+     }
+};
+
+
+template<typename T>
+struct tree_node{
+     tree_node(T value, tree_node<T> *left = nullptr, tree_node<T> *right = nullptr)
+          : value(value), left(left), right(right)
+     {
+     }
+     T value;
+     tree_node<T> *left;
+     tree_node<T> *right;
+};
+
 
 template<typename T>
 class binary_search_tree{
@@ -136,4 +165,53 @@ class binary_search_tree{
 };
 
 
-#endif
+class application{
+     public:
+          void run(size_t persons_n){
+               for (size_t i = 0; i < persons_n; i++){
+                    person new_person;
+                    std::cin >> new_person;
+                    _tree.add(new_person);
+               }
+               _tree.print_preorder();
+               _tree.print_inorder();
+               _tree.print_postorder();
+
+               std::cout << "\ntree height = " << _tree.height();
+               std::cout << "\nleaves amount = " << _tree.leaves();
+
+               std::cout << "\n\nenter a name to look for: ";
+               std::string name;
+               std::cin >> name;
+
+               auto query = _tree.find_if(
+                    [&name](const person &p){
+                         return p.name == name;
+                    }
+               );
+
+               if (query.has_value()){
+                    person found_person = *query;
+                    std::cout << name << " weights " << found_person.weight << " lbs";
+               }
+               else std::cout << "no match exists";
+               
+               person lowest_weight_person = _tree.find_extremality(
+                    [](const person &p1, const person &p2){
+                         return p1.weight < p2.weight;
+                    }
+               );
+
+               std::cout << "\n\nlowest weight contained in the tree: " << lowest_weight_person.weight 
+                         << " lbs (belonging to " << lowest_weight_person.name << ")";
+
+               std::cout << "\n\nfirst name in alphabetical order is " << _tree.minimum().name;  
+          }
+     private:
+          binary_search_tree<person> _tree;
+};
+
+int main(){
+     application app;
+     app.run(15);
+}
