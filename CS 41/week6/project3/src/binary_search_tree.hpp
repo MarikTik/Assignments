@@ -17,11 +17,8 @@ class binary_search_tree{
                std::function<void(T, tree_node<T>**)> add_impl = [&](T value, tree_node<T> **root_ptr){
                     auto *node = new tree_node<T>(value);
                     auto &root = *root_ptr;
-
                     if (not root) root = node;
-
                     else if (value < root->value) add_impl(value, &root->left);
-
                     else add_impl(value, &root->right); 
                };
                add_impl(value, &_root);
@@ -30,13 +27,9 @@ class binary_search_tree{
           size_t height(){
                visitor_f<size_t> height_impl = [&](tree_node<T> *node){
                     auto *left = node->left, *right = node->right;
-
                     if (left and right) return 1 + std::max({height_impl(left), height_impl(right)});
-
                     if (left) return 1 + height_impl(left);
-
                     if (right) return 1 + height_impl(right);
-
                     return 0lu; // leaf found
                };
                return height_impl(_root);
@@ -45,13 +38,9 @@ class binary_search_tree{
           size_t leaves(){
                visitor_f<size_t> leaves_impl = [&](tree_node<T> *node){
                     auto *left = node->left, *right = node->right;
-
                     if (left and right) return leaves_impl(left) + leaves_impl(right);
-
                     if (left) return leaves_impl(left);
-
                     if (right) return leaves_impl(right);
-
                     return 1lu; // leaf found
                };
                return leaves_impl(_root);
@@ -69,7 +58,6 @@ class binary_search_tree{
                     if (not node) return std::nullopt;
 
                     const auto& value = node->value;
-
                     if (std::invoke(predicate, value)) return value;
 
                     const auto left_find = find_impl(node->left);
@@ -90,16 +78,12 @@ class binary_search_tree{
                     "Predicate must be invocable with (const T&, const T&) and return a boolean"
                );
                if (not _root) throw std::underflow_error("binary tree is empty");
-               
+
                T minimum = _root->value;
 
                visitor_f<void> custom_minimum = [&](tree_node<T> *node){
-                    if (not node)
-                         return;
-
-                    if (predicate(node->value, minimum))
-                         minimum = node->value;
-
+                    if (not node) return;
+                    if (predicate(node->value, minimum)) minimum = node->value;
                     custom_minimum(node->left);
                     custom_minimum(node->right); // forced to search all the tree for custom minimums      
                };
@@ -112,7 +96,6 @@ class binary_search_tree{
                     return node->value;
                };
                if (not _root) throw std::underflow_error("binary tree is empty");
-
                return minimum_impl(_root);
           }
 
