@@ -36,7 +36,6 @@ struct tree_node{
 
 template<typename T>
 class binary_search_tree{
-     using printer_f = std::function<void(std::ostream&, tree_node<T> *)>;
 
      template<typename U>
      using visitor_f = std::function<U(tree_node<T> *)>;
@@ -98,7 +97,7 @@ class binary_search_tree{
                };
                return find_impl(_root);
           }
-          // this function will run over the tree in search of an element that has the most extreme vakye of a desired property
+          // this function will run over the tree in search of an element that has the most extreme value of a desired property
           template<typename Predicate> 
           T find_extremality(Predicate predicate){
                static_assert(
@@ -127,36 +126,36 @@ class binary_search_tree{
           }
 
           void print_preorder(std::ostream &os = std::cout){
-               printer_f print_preorder_impl = [&](std::ostream &os, tree_node<T> *node){
+               visitor_f<void> print_preorder_impl = [&](tree_node<T> *node){
                     if (node) {
                          os << node->value << " ";
-                         print_preorder_impl(os, node->left);
-                         print_preorder_impl(os, node->right);
+                         print_preorder_impl(node->left);
+                         print_preorder_impl(node->right);
                     }
                };
-               print_preorder_impl(os, _root);
+               print_preorder_impl(_root);
                os << "\n";
           }
           void print_postorder(std::ostream &os = std::cout){
-               printer_f print_postorder_impl = [&](std::ostream &os, tree_node<T> *node){
+               visitor_f<void> print_postorder_impl = [&](tree_node<T> *node){
                     if (node) {
-                         print_postorder_impl(os, node->left);
-                         print_postorder_impl(os, node->right);
+                         print_postorder_impl(node->left);
+                         print_postorder_impl(node->right);
                          os << node->value << " ";
                     }
                };
-               print_postorder_impl(os, _root);
+               print_postorder_impl(_root);
                os << "\n";
           }
           void print_inorder(std::ostream &os = std::cout){
-               printer_f print_inorder_impl = [&](std::ostream &os, tree_node<T> *node){
+               visitor_f<void> print_inorder_impl = [&](tree_node<T> *node){
                     if (node) {
-                         print_inorder_impl(os, node->left);
+                         print_inorder_impl(node->left);
                          os << node->value << " ";
-                         print_inorder_impl(os, node->right);
+                         print_inorder_impl(node->right);
                     }
                };
-               print_inorder_impl(os, _root);
+               print_inorder_impl(_root);
                os << "\n";
           }
 
