@@ -14,14 +14,14 @@ class binary_search_tree{
 
      public:
           void add(T value){
-               std::function<void(T, tree_node<T>**)> add_impl = [&](T value, tree_node<T> **root_ptr){
+               std::function<void(tree_node<T>**)> add_impl = [&](tree_node<T> **root_ptr){
                     auto *node = new tree_node<T>(value);
                     auto &root = *root_ptr;
                     if (not root) root = node;
-                    else if (value < root->value) add_impl(value, &root->left);
-                    else add_impl(value, &root->right); 
+                    else if (value < root->value) add_impl(&root->left);
+                    else add_impl(&root->right); 
                };
-               add_impl(value, &_root);
+               add_impl(&_root);
           }
 
           size_t height(){
