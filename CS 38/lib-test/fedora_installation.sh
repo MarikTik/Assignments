@@ -1,0 +1,5 @@
+sudo dnf remove java-21-openjdk
+sudo dnf install java-21-openjdk
+
+sudo dnf install java-21-openjdk-headless
+sudo dnf install java-21-openjdk-devel
