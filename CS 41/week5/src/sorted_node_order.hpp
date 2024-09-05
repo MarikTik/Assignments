@@ -1,18 +1,8 @@
+#ifndef SORTED_NODE_ORDER_HPP
+#define SORTED_NODE_ORDER_HPP
+#include "node.hpp"
 #include <ostream>
-#include <iostream>
-#include <functional>
-#include <string>
-
-template<typename T>
-struct node {
-     node(T value) : data(value)
-     {      
-     }
-     T data;
-     node<T> *next = nullptr;
-     node<T> *previous = nullptr;
-};
-
+// sorts by values of type T, and maintains track U type values
 template<typename T, typename U>
 class sorted_node_order{
      public:
@@ -112,64 +102,35 @@ class sorted_node_order{
           node<U>* _u_head = nullptr;
 };
 
-
-template<typename T, typename U>
-class sorted_list{
-
-     template<typename Y>
-     using comparator_t = std::function<bool(Y, Y)>;
-
-     public:
-          sorted_list(comparator_t<T> t_comparator, comparator_t<U> u_comparator) 
-               : _t_comparator(t_comparator), _u_comparator(u_comparator)
-          {
-          }
-          sorted_list() = default;
-
-          void insert(T first_value, U second_value){
-               _t_order.insert(first_value, second_value, _t_comparator);
-               _u_order.insert(second_value, first_value, _u_comparator);
-          }
-
-          void print_first_order(std::ostream &os = std::cout) const{
-               os << _t_order;
-          }
-          void print_second_order(std::ostream &os = std::cout) const{
-               os << _u_order;
-          }
-     private:
-          sorted_node_order<T, U> _t_order;
-          sorted_node_order<U, T> _u_order;
-
-          comparator_t<T> _t_comparator;
-          comparator_t<U> _u_comparator;
-};
-
-
-class application{
-     public:
-          void run(size_t persons_n){
-               for (size_t i = 0; i < persons_n; i++){
-                    std::string name;
-                    double weight;
-                    std::cin >> name >> weight;
-                    _list.insert(name, weight);
-               }
-               std::cout << "Names & weights sorted(ascending) by name. : ";
-               _list.print_first_order();
-
-               std::cout << "\nNames & weights sorted(ascending) by weight. : ";
-               _list.print_second_order();
-               std::cout << std::endl;
-          }
-     private:
-          sorted_list<std::string, double> _list{
-               std::less<const std::string &>{},
-               std::less<double >{}
-          };
-};
- 
-int main(){
-     application app;
-     app.run(15);
-}
+// template<typename T, typename Comparator>
+// void insert_sorted(node<T> *&head,T value, Comparator &&comparator){
+//      node<T> *new_node = new node<T>(value);
+//      if (not head)
+//      {
+//           head = new_node;
+//           return;
+//      } 
+//      node<T> *current = head;
+//      node<T> *previous = nullptr;
+//      while (current and comparator(current->data, value)){
+//           previous = current;
+//           current = current->next;
+//      }
+//      if (not previous) // the comparator returned false immediately, hence swap head with new node
+//      {
+//           new_node->next = head;
+//           head->previous = new_node;
+//           head = new_node;
+//      }
+//      else if (current){ // _comparator returned false hence there is a continuation of the list to attach
+//           previous->next = new_node;
+//           new_node->previous = previous;
+//           new_node->next = current;
+//           current->previous = new_node;
+//      }
+//      else{ // end of list reached, so the new node is the last one
+//           previous->next = new_node;
+//           new_node->previous = previous;
+//      }
+// }
+#endif
