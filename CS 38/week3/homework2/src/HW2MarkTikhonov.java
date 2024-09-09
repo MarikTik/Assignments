@@ -1,7 +1,7 @@
 import java.util.Scanner;
 import java.awt.Color;
 import java.awt.Font;
-
+import java.util.Random;
 
 /**
  * Description
@@ -55,6 +55,8 @@ public class HW2MarkTikhonov {
           "CH 2 Homework by Mark Tikhonov"
      );
 
+     private final static Random rand = new Random(); 
+
      public static Draw standardScreen(ScreenSettings settings){
           Draw screen = new Draw();
 
@@ -64,20 +66,22 @@ public class HW2MarkTikhonov {
           screen.setYscale(settings.height, 0);
           screen.setTitle(settings.title);
           screen.clear(settings.backgroundColor);
-       
-          screen.setPenColor(Color.BLACK);
 
-          //writing my name
-          screen.setFont(nameFont);
-          screen.text(halfWidth, nameFont.getSize(), "Mark Tikhonov");
+          screen.setPenColor(rand.nextInt(140, 255), rand.nextInt(140, 255), rand.nextInt(140, 255)); // random color differing from gray
+          int fontSize = rand.nextInt(10, 32); // random font size
+          int rotation = rand.nextInt(-40, 40); // random rotation
+          screen.setFont(new Font("Arial", Font.BOLD, fontSize));  
+          screen.text(halfWidth, nameFont.getSize(), "Mark Tikhonov", rotation);
 
           //drawing delimter lines as a proof of concept
           screen.line(halfWidth, settings.height, halfWidth, 0);
           screen.line(0, halfHeight, settings.width, halfHeight);
-
+          
           //setting desired writing settings
           screen.setFont(settings.font);
           screen.setPenColor(settings.penColor);
+
+
           return screen;
      }
 
@@ -239,12 +243,12 @@ public class HW2MarkTikhonov {
      }
      public static void main(String []args){
 
-          //nameAgeIncome();
-          //personalInfo();     
-          //salesPredict();
-          //salesTax();
-          //milesPerGal();
-          //circuitBoard();
-          //restaurantBill();
+          // nameAgeIncome();
+          // personalInfo();     
+          // salesPredict();
+          // salesTax();
+          // milesPerGal();
+          // circuitBoard();
+          // restaurantBill();
      }
 }
