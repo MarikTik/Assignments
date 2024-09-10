@@ -42,7 +42,10 @@ class stack{
           node<T> *_top;
           size_t _count = 0;
 };
+ 
 
+ 
+ 
 int main(){
      stack<long> stk;
      long number = 0;
