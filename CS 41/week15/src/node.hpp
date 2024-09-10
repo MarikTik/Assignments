@@ -3,7 +3,8 @@
 
 template<typename T>
 struct node{
-     node(T val) : value(val)
+     template<typename TForward>
+     node(TForward &&val) : data(std::forward<TForward>(val))
      {
      }
      void attach_next(node<T> *next_node){
@@ -14,7 +15,7 @@ struct node{
           previous_node->next = this;
           this->previous = previous_node;
      }
-     T value;
+     T data;
      node<T> *previous;
      node<T> *next;
 };

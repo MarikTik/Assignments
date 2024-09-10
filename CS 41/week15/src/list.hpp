@@ -7,8 +7,9 @@
 template<typename T>
 class list{
      public:
-          void push_back(T value){
-               auto *new_node = new node<T>(value);
+          template<typename TForward>
+          void push_back(TForward &&value){
+               auto *new_node = new node<T>(std::forward<TForward>(value));
                if (not _head) {
                     _head = new_node;
                }
@@ -22,6 +23,21 @@ class list{
                }
           }         
 
+          template<typename Predicate>
+          void remove(Predicate predicate, bool remove_all=false){
+               auto* ptr = _head;
+               while(ptr){
+                    
+               }
+          }
+
+          template<typename TForward>
+          void remove(TForward &&value){
+               remove([&value](const T& val){
+                    return value == val;
+               });
+          }
+
           void clear(){
                while(_head){
                     auto* previous = _head;
@@ -33,6 +49,9 @@ class list{
 
           class iterator{
                public:
+                    iterator(node<T> *head){
+                         current = head;
+                    }
                     T &operator *() const{
                          return current->data;
                     }

@@ -58,8 +58,7 @@ class dynamic_array{
           
      private:
           T *_array;
-          size_t _capacity;
-          size_t _size;
+          size_t _capacity, size_t _size;
 
 };
 
