@@ -8,10 +8,12 @@ struct node{
      {
      }
      void attach_next(node<T> *next_node){
+          if (not next_node) return;
           next_node->previous = this;
           this->next = next_node;
      }
      void attach_previous(node<T> *previous_node){
+          if (not previous_node) return;
           previous_node->next = this;
           this->previous = previous_node;
      }

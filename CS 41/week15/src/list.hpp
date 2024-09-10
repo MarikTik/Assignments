@@ -24,16 +24,30 @@ class list{
           }         
 
           template<typename Predicate>
-          void remove(Predicate predicate, bool remove_all=false){
+          void remove_if(Predicate predicate, bool remove_all=false){
                auto* ptr = _head;
                while(ptr){
-                    
+                    if (std::invoke(predicate, ptr->data)){
+                         auto* next = ptr->next;
+                         if (ptr == _head){
+                              delete _head;
+                              _head = next;
+                         }
+                         else{
+                              auto* previous = ptr->previous;
+                              previous->attach_next(next);
+                              delete ptr;
+                         }
+
+                         if (not remove_all) break;
+                    }
+                    ptr = ptr->next;
                }
           }
 
           template<typename TForward>
           void remove(TForward &&value){
-               remove([&value](const T& val){
+               remove_if([&value](const T& val){
                     return value == val;
                });
           }

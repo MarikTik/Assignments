@@ -33,9 +33,9 @@ class hash_table{
      void remove(TKeyForward &&key){
 
           size_t bucket_index = _hash(std::forward<TKeyForward>(key));
-          _buffer[bucket_index].remove(
-
-          );
+          _buffer[bucket_index].remove_if([&key](auto pair){
+               return pair.first == key;
+          });
           _size--;
      }
      size_t size() const{
