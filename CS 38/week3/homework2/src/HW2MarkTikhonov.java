@@ -243,7 +243,7 @@ public class HW2MarkTikhonov {
      }
      public static void main(String []args){
 
-          // nameAgeIncome();
+           nameAgeIncome();
           // personalInfo();     
           // salesPredict();
           // salesTax();
