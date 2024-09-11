@@ -61,27 +61,62 @@ class list{
 
           }
 
-          class iterator{
-               public:
-                    iterator(node<T> *head){
-                         current = head;
-                    }
-                    T &operator *() const{
-                         return current->data;
-                    }
-                    iterator &operator ++(){
-                         current = current->next;
-                         return *this;
-                    }
-                    bool operator == (const iterator &other) const{
-                         return current == other.current;
-                    }
-                    bool operator != (const iterator &other) const{
-                         return current != other.current;
-                    }
-               private:
-                    node<T> *current;
+          class iterator {
+          public:
+               using iterator_category = std::bidirectional_iterator_tag;
+               using difference_type = std::ptrdiff_t;
+               using value_type = T;
+               using pointer = T*;
+               using reference = T&;
+
+              
+               iterator(node<T> *head) : current(head) {}
+
+             
+               T& operator*() const {
+                    return current->data;
+               }
+
+              
+               iterator& operator++() {
+                    current = current->next;
+                    return *this;
+               }
+
+              
+               iterator operator++(int) {
+                    iterator tmp = *this;
+                    current = current->next;
+                    return tmp;
+               }
+
+
+               iterator& operator--() {
+                    current = current->previous;
+                    return *this;
+               }
+
+              
+               iterator operator--(int) {
+                    iterator tmp = *this;
+                    current = current->previous;
+                    return tmp;
+               }
+
+              
+               bool operator==(const iterator &other) const {
+                    return current == other.current;
+               }
+
+              
+               bool operator!=(const iterator &other) const {
+                    return current != other.current;
+               }
+               
+          private:
+              node<T> *current;
           };
+
 
           iterator begin() const { return iterator(_head); }
           iterator end() const { return iterator(nullptr); }
