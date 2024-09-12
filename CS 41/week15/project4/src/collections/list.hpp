@@ -1,6 +1,6 @@
 #ifndef LIST_HPP
 #define LIST_HPP
-#include "node.hpp"
+#include "../utils/dl_node.hpp"
 #include <functional>
 #include <type_traits>
 
@@ -9,17 +9,17 @@ class list{
      public:
           template<typename TForward>
           void push_back(TForward &&value){
-               auto *new_node = new node<T>(std::forward<TForward>(value));
+               auto *node = new dl_node<T>(std::forward<TForward>(value));
                if (not _head) {
-                    _head = new_node;
+                    _head = node;
                }
                else if (not _tail) {
-                    _tail = new_node;
+                    _tail = node;
                     _tail->attach_previous(_head);
                }
                else{
-                    _tail->attach_next(new_node);
-                    _tail = new_node;
+                    _tail->attach_next(node);
+                    _tail = node;
                }
           }         
 
@@ -70,19 +70,16 @@ class list{
                using reference = T&;
 
               
-               iterator(node<T> *head) : current(head) {}
+               iterator(dl_node<T> *head) : current(head) {}
 
-             
                T& operator*() const {
                     return current->data;
                }
-
               
                iterator& operator++() {
                     current = current->next;
                     return *this;
                }
-
               
                iterator operator++(int) {
                     iterator tmp = *this;
@@ -90,12 +87,10 @@ class list{
                     return tmp;
                }
 
-
                iterator& operator--() {
                     current = current->previous;
                     return *this;
                }
-
               
                iterator operator--(int) {
                     iterator tmp = *this;
@@ -103,18 +98,16 @@ class list{
                     return tmp;
                }
 
-              
                bool operator==(const iterator &other) const {
                     return current == other.current;
                }
-
               
                bool operator!=(const iterator &other) const {
                     return current != other.current;
                }
                
           private:
-              node<T> *current;
+              dl_node<T> *current;
           };
 
 
@@ -123,7 +116,7 @@ class list{
          
           ~list(){ clear(); }
      private:
-          node<T> *_head = nullptr, *_tail = nullptr;
+          dl_node<T> *_head = nullptr, *_tail = nullptr;
 };
 
 

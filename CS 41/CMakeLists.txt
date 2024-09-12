@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.22.1)
 project(proj_tester)
 
-add_executable(${PROJECT_NAME} week15/src/main.cpp)
+add_executable(${PROJECT_NAME} week15/project4/src/main.cpp week15/project4/src/parser/expression_parser.cpp)
 
 
 add_compile_options(
