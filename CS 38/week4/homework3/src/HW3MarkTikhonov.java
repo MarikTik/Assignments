@@ -1,6 +1,7 @@
 //import java.util.Scanner;
 import java.awt.Font;
 import java.util.Scanner;
+import java.awt.Color;
 /**
  * Description
  * class with all the required methods from homework 3 
@@ -10,23 +11,70 @@ import java.util.Scanner;
  */
 public class HW3MarkTikhonov {
 
-    // // range 1 - 10
-    public static int romanNumeralToNumber(String numeral){
-        switch (numeral) {
-            case "I": return 1;
-            case "II": return 2;
-            case "III": return 3;
-            case "IV": return 4;
-            case "V": return 5;
-            case "VI": return 6;
-            case "VII": return 7;
-            case "VIII": return 8;
-            case "IX": return 9;
-            case "X": return 10;
+   /**
+     * Description
+     * encapsulates some of the setup settings for Draw object screens
+     * 
+     * @author Mark Tikhonov
+     * @version 0.0.1
+     */
+    static class ScreenSettings{
+        public int width;
+        public int height;
+        public Color backgroundColor;
+        public Color penColor;
+        public Font font;
+        public String title;
+   
+        public ScreenSettings(int width, int height, Color backgroundColor, Color penColor, Font font, String title){
+            this.width = width;
+            this.height = height;
+            this.backgroundColor = backgroundColor;
+            this.penColor = penColor;
+            this.font = font;
+            this.title = title;
         }
-        return -1;
     }
-    
+
+   
+    public static Draw standardScreen(ScreenSettings settings){
+        Draw screen = new Draw();
+
+        //scaling the screen
+        screen.setCanvasSize(settings.width, settings.height);
+        screen.setXscale(0, settings.width);
+        screen.setYscale(settings.height, 0);
+        screen.setTitle(settings.title);
+        screen.clear(settings.backgroundColor);
+
+        screen.setPenColor(Draw.BLACK);  
+        screen.setFont(settings.font);  
+        //screen.text(halfWidth, nameFont.getSize(), "Mark Tikhonov", rotation);
+
+        //drawing delimter lines as a proof of concept
+        screen.line(settings.width / 2, settings.height, settings.width / 2, 0);
+        screen.line(0, settings.height / 2, settings.width, settings.height / 2);
+        
+        screen.setPenColor(settings.penColor);
+        return screen;
+    }
+
+    public static Draw writeLines(Draw screen, int x, int y, String []lines){
+        int yOffset = screen.getFont().getSize();
+        y += yOffset;
+        for (var line : lines){ // I have seen this in the quiz so it's reasonable to use it
+             screen.textLeft(x, y, line);
+             y += yOffset;
+        }
+
+        return screen;
+    }
+
+    // accepts newlines as a way to split a single line into pieces
+    public static Draw writeLine(Draw screen, int x, int y, String line){
+        writeLines(screen, x, y, line.split("[\n]"));
+        return screen;
+    }
     // this interface will be used as a placeholder for lambda expressions of the form T expression(T val1, T val2)
     // so that everything that looks like it will fit nicely.
     interface Comparator<T>{
@@ -61,6 +109,15 @@ public class HW3MarkTikhonov {
         System.out.print("Enter roman numeral in the range of 1-10 (I - X): ");
         Scanner scanner = new Scanner(System.in);
         String numeral = scanner.nextLine();
+        Draw screen = standardScreen(
+            new ScreenSettings(
+                400,
+                400,
+                Draw.GRAY,
+                Draw.RED, 
+                new Font("Serif", Font.BOLD, 24),
+                "romanNumerals by Mark Tikhonov"
+        ));
 
         int result = switch(numeral){
             case "I" -> 1;
@@ -76,14 +133,30 @@ public class HW3MarkTikhonov {
 
             default -> -1;
         };
-        if (result == -1) System.out.println("Error: Numeral is not in range 1 - 10");
-        else System.out.printf("%s = %d\n", numeral, result);
+        if (result == -1) {
+            System.out.println("Error: Numeral is not in range 1 - 10");
+            writeLine(screen, 16, 16, "Error:\nNumeral is\nnot in \nrange\n1-10");
+        }
+        else {
+            System.out.printf("%s = %d\n", numeral, result);
+            screen.textLeft(16, 16, numeral + " = " + result);
+        }
         scanner.close();
     }
 
     public static void sortedNames(){
         Scanner scanner = new Scanner(System.in);
         String[] names = new String[3];
+        Draw screen = standardScreen(
+            new ScreenSettings(
+                400,
+                400,
+                Draw.GRAY,
+                Draw.RED, 
+                new Font("Helvetica", Font.BOLD, 24),
+                "sortedNames by Mark Tikhonov"
+        ));
+
         System.out.println("Enter three names to be sorted in ascending order: ");
         
         for (int i = 0; i < 3; i++)
@@ -96,7 +169,7 @@ public class HW3MarkTikhonov {
 
         for (var name : names)
             System.out.println(name);
-
+        writeLines(screen, 16, 16, names);
         scanner.close();
         // echo "Charlie Leslie Andy" | java week4/homework3/src/HW3MarkTikhonov.java
     }
@@ -105,6 +178,16 @@ public class HW3MarkTikhonov {
         String []horsemen = new String[3];
         double []raceTimes = new double[3];
         Scanner scanner = new Scanner(System.in);
+        Draw screen = standardScreen(
+            new ScreenSettings(
+                400,
+                400,
+                Draw.GRAY,
+                Draw.RED, 
+                new Font("Ariel", Font.BOLD, 24),
+                "runningTheRace by Mark Tikhonov"
+        ));
+
         System.out.println("Enter horseman racers names and the time it took tham to complete the race in the format: [name] [time]");
         for(int i = 0; i < 3; i++){
             horsemen[i] = scanner.next();
@@ -123,7 +206,11 @@ public class HW3MarkTikhonov {
         for (int i = 0; i < 3; i++){
             System.out.printf("%d. %s\n", i + 1, horsemen[i]);
         }
-        
+        writeLines(screen, 16, 16, new String[]{
+            "1. " + horsemen[0],
+            "2. " + horsemen[1],
+            "3. " + horsemen[2]
+        });
         //echo "Charlie 3 Leslie 10 Andy 1" | java week4/homework3/src/HW3MarkTikhonov.java
         scanner.close();
     }
@@ -131,16 +218,10 @@ public class HW3MarkTikhonov {
 
     public static void main(String []args){
         //romanNumerals();
-        sortedNames();
-        //runningTheRace();
+        //sortedNames();
+        runningTheRace();
         
-        // Draw screen = new Draw();
-        // screen.setCanvasSize(400, 400);
-        // screen.setXscale(0, 400);
-        // screen.setYscale(400, 0);
-        // screen.clear(Draw.GRAY);
-        // screen.setPenColor(Draw.BLACK);
-        // screen.drawLine(0, 0, 400, 400);
+        
     }
 }   
 
