@@ -1,6 +1,7 @@
 //import java.util.Scanner;
 import java.awt.Font;
 import java.util.Scanner;
+import java.util.Random;
 import java.awt.Color;
 /**
  * Description
@@ -18,6 +19,9 @@ public class HW3MarkTikhonov {
      * @author Mark Tikhonov
      * @version 0.0.1
      */
+
+    private static final Random rand = new Random();
+
     static class ScreenSettings{
         public int width;
         public int height;
@@ -46,6 +50,16 @@ public class HW3MarkTikhonov {
         screen.setYscale(settings.height, 0);
         screen.setTitle(settings.title);
         screen.clear(settings.backgroundColor);
+        
+        // write my name in the bottom under random orientation
+        screen.setFont(new Font("Serif", Font.ITALIC, 32));
+        screen.setPenColor(Draw.PINK);
+        screen.text(
+            settings.width / 2,
+            settings.height - screen.getFont().getSize() * 2,
+            "Mark Tikhonov",
+            rand.nextInt(-40, 40)
+        );
 
         screen.setPenColor(Draw.BLACK);  
         screen.setFont(settings.font);  
@@ -56,6 +70,8 @@ public class HW3MarkTikhonov {
         screen.line(0, settings.height / 2, settings.width, settings.height / 2);
         
         screen.setPenColor(settings.penColor);
+
+
         return screen;
     }
 
@@ -106,6 +122,7 @@ public class HW3MarkTikhonov {
     }
 
     public static void romanNumerals(){
+        
         System.out.print("Enter roman numeral in the range of 1-10 (I - X): ");
         Scanner scanner = new Scanner(System.in);
         String numeral = scanner.nextLine();
@@ -171,7 +188,6 @@ public class HW3MarkTikhonov {
             System.out.println(name);
         writeLines(screen, 16, 16, names);
         scanner.close();
-        // echo "Charlie Leslie Andy" | java week4/homework3/src/HW3MarkTikhonov.java
     }
 
     public static void runningTheRace(){
@@ -211,15 +227,14 @@ public class HW3MarkTikhonov {
             "2. " + horsemen[1],
             "3. " + horsemen[2]
         });
-        //echo "Charlie 3 Leslie 10 Andy 1" | java week4/homework3/src/HW3MarkTikhonov.java
         scanner.close();
     }
 
 
     public static void main(String []args){
-        //romanNumerals();
+        romanNumerals();
         //sortedNames();
-        runningTheRace();
+        //runningTheRace();
         
         
     }
