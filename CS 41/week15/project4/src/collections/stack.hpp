@@ -30,7 +30,7 @@ class stack{
                if (is_empty()) throw std::underflow_error("attempted to peek an element from stack, but it is empty");
                return _top->data;
           }
-          size_t size() const{
+          inline size_t size() const{
                return _size;
           }
           ~stack(){
@@ -42,7 +42,7 @@ class stack{
                }
           }
      private:
-          sl_node<T> *_top;
+          sl_node<T> *_top = nullptr;
           size_t _size = 0;
 };
 

@@ -11,7 +11,7 @@ struct sl_node{
           this->next = next;
      }
      T data;
-     sl_node<T> *next;
+     sl_node<T> *next = nullptr;
 };
 
 #endif

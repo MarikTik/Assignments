@@ -1,19 +1,39 @@
 #include <iostream>
 #include <fstream>
+#include <cmath>
+#include <sstream>
 #include "borg_interpreter.hpp"
 #include "parser/expression_parser.hpp"
+
 int main(int argc, char *argv[]){  
-     if (argc != 2){
-          std::cout << "usage: ./borg <path>\n";
-          return EXIT_FAILURE;
-     }
-     std::ifstream borg_stream(argv[1]);
-     if (not borg_stream.is_open()){
-          std::cerr << "error: unable to open file " << argv[1] << "\n";
-          return EXIT_FAILURE;
-     }
-     borg_interpreter interpreter;
-     interpreter.interpret(borg_stream);
+
+
+//      using algebric_operator_t = std::function<double(double, double)>;
+// using comparison_operator_t = std::function<bool(double, double)>;
+// using logical_opeartor_t = std::function<bool (bool, bool)>;
+
+// static string_map<uint8_t> operator_precedence{
+//     {"||", 1},
+//     {"&&", 2},
+//     {"<", 3},
+//     {">", 3},
+//     {"<=", 3},
+//     {">=", 3},
+//     {"==", 4},
+//     {"!=", 4},
+//     {"+", 5},
+//     {"-", 5},
+//     {"*", 6},
+//     {"/", 6},
+//     {"%", 6},
+//     {"**", 7}
+// };
+   
      
-    
+     expression_parser parser;
+     std::string expression = "1 + 5 * 3 + 1 - 3 ** 3";
+     auto stream = std::stringstream(expression);
+     std:: cout << parser.parse(stream) << "\n";
+ 
+
 }

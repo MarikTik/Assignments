@@ -20,8 +20,8 @@ struct dl_node{
                this->previous = previous_node;
           }
           T data;
-          dl_node<T> *previous;
-          dl_node<T> *next;
+          dl_node<T> *previous = nullptr;
+          dl_node<T> *next = nullptr;
 };
 
 #endif

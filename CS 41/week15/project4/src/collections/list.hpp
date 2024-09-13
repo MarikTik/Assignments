@@ -45,13 +45,6 @@ class list{
                }
           }
 
-          template<typename TForward>
-          void remove(TForward &&value){
-               remove_if([&value](const T& val){
-                    return value == val;
-               });
-          }
-
           void clear(){
                while(_head){
                     auto* previous = _head;
@@ -60,7 +53,7 @@ class list{
                }
 
           }
-
+          
           class iterator {
           public:
                using iterator_category = std::bidirectional_iterator_tag;

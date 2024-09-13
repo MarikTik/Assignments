@@ -4,7 +4,7 @@
 #include <istream>
 
 
-class expression_parser{
+struct expression_parser{
      std::string parse(std::istream &is); 
 };
 

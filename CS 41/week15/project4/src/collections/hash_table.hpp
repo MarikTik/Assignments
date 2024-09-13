@@ -25,12 +25,11 @@ class hash_table{
 
           hash_table(std::initializer_list<item_t> items)
                : _capacity(items.size()),
-               _buffer(new bucket_t[_capacity]),
+               _buffer(new bucket_t[items.size()]),
                _size(_capacity)
           {
                for (const item_t &item : items){
-                    size_t bucket_index = _hash(item.first);
-                    _buffer[bucket_index].push_back(std::move(item));
+                   emplace(std::move(item.first), std::move(item.second));
                }
           }
 
@@ -43,8 +42,7 @@ class hash_table{
                _size++;
           }
 
-          template<typename Key>
-          void remove(Key &&key){
+          void remove(const TKey &key){
                size_t bucket_index = _hash(key);
                _buffer[bucket_index].remove_if([&key](const auto& item){
                     return item.first == key;
@@ -52,8 +50,7 @@ class hash_table{
                _size--;
           }
 
-          template<typename Key>
-          TValue& at(Key &&key){
+          TValue& at(const TKey &key){
                size_t bucket_index = _hash(key);
                bucket_t &bucket = _buffer[bucket_index];
                auto iterator = std::find_if(bucket.begin(), bucket.end(),
@@ -62,13 +59,12 @@ class hash_table{
                     }
                );
                if (iterator == bucket.end()) throw std::out_of_range("key error: key not found in hash table");
-               return iterator->second;
+               return (*iterator).second;
           }
 
-          template<typename Key>
-          bool contains(Key &&key){
+          bool contains(const TKey &key){
                size_t bucket_index = _hash(key);
-               bucket_t bucket = _buffer[bucket_index];
+               bucket_t &bucket = _buffer[bucket_index];
                auto iterator = std::find_if(bucket.begin(), bucket.end(),
                     [&key](const item_t& item){
                          return item.first == key;
