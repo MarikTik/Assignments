@@ -3,7 +3,6 @@
 #include <string>
 #include <istream>
 
-
 struct expression_parser{
      std::string parse(std::istream &is); 
 };

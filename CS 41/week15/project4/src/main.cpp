@@ -4,6 +4,7 @@
 #include <sstream>
 #include "borg_interpreter.hpp"
 #include "parser/expression_parser.hpp"
+#include "parser/expression_token.hpp"
 
 int main(int argc, char *argv[]){  
 
@@ -30,10 +31,16 @@ int main(int argc, char *argv[]){
 // };
    
      
-     expression_parser parser;
-     std::string expression = "1 + 5 * 3 + 1 - 3 ** 3";
+     // expression_parser parser;
+     std::string expression = "1+5*3+1-3**3";
      auto stream = std::stringstream(expression);
-     std:: cout << parser.parse(stream) << "\n";
+     // //std:: cout << parser.parse(stream) << "\n";
  
+     expression_token token;
+     
+
+     // std::variant<std::string, double> var = 5.1;
+     // std::cout << std::get<double>(var) << std::endl;
+
 
 }

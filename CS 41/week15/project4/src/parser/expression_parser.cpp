@@ -51,7 +51,7 @@ static string_map<comparison_operator_t> comparison_operators {
     {"!=", [](double a, double b) {return a != b;}},
 };
 //
- 
+
 std::string expression_parser::parse(std::istream &is)
 {
     stack<double> operands;
