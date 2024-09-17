@@ -4,7 +4,7 @@
 #include <variant>
 #include <istream>
 #include <sstream>
-#include <iostream>
+#include <type_traits>
 
 class expression_token{
      using token_variant_t = std::variant<std::string, double, long>;
@@ -23,7 +23,8 @@ class expression_token{
           }
           template<typename T>
           void set(T && value){
-               _variants.emplace<T>(value);
+               if (constexpr )
+               _variants.emplace<T>(std::forward<T>(value));
           }
 
      private:
