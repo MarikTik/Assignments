@@ -10,7 +10,6 @@ public class Lecture2 {
         int arrowHeight = 30;
         int arrowXoffset = 30 + arrowWidth;
         int arrowYOffset = height / 2;
-
         screen.setPenColor(Draw.BLACK);
         screen.filledRectangle(arrowXoffset, arrowYOffset, arrowWidth, arrowHeight);
         screen.filledPolygon(

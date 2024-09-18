@@ -1,6 +1,7 @@
 import java.awt.Color;
 import java.awt.Font;
 //import java.math;
+import java.util.Random;
 
 /**
  * Description
@@ -29,16 +30,11 @@ public class Program {
         }
     }
 
-    public static <T> T[] subArray(T []array, int begin, int end){
-       
-        Object[] partialArray = new Object[end - begin];
-        for (int i = begin; i < end; i++)
-            partialArray[i - begin] = array[i];
-        
-        return (T[])partialArray;
-    }
-   
+    
     public static void main(String []args){
+
+        Random rand = new Random();
+        
         Draw draw = new Draw();
         draw.setCanvasSize(400, 400);
         draw.setXscale(0, 400);
