@@ -81,8 +81,8 @@ class list{
                using iterator_category = std::bidirectional_iterator_tag;
                using difference_type = std::ptrdiff_t;
                using value_type = T;
-               using pointer = T*;
-               using reference = T&;
+               using pointer = value_type *;
+               using reference = value_type &;
 
               
                iterator(dl_node<T> *head) : current(head) {}
@@ -205,8 +205,8 @@ class dynamic_array{
                using iterator_category = std::random_access_iterator_tag;
                using value_type = T;
                using difference_type = std::ptrdiff_t;
-               using pointer = T*;
-               using reference = T&;
+               using pointer = value_type *;
+               using reference = value_type &;
 
                iterator(T* ptr) : _ptr(ptr) {}
 
@@ -379,6 +379,110 @@ class hash_table{
           inline size_t size() const{
                return _size;
           }
+
+          class iterator{
+               public:
+                    using iterator_category = std::bidirectional_iterator_tag;
+                    using value_type = item_t;
+                    using difference_type = std::ptrdiff_t;
+                    using pointer = value_type *;
+                    using reference = value_type &;
+
+                    using bucket_iterator_t = typename dynamic_array<bucket_t>::iterator;
+                    using list_iterator_t = typename list<item_t>::iterator;
+
+                    iterator(
+                         bucket_iterator_t bucket_iterator_begin,
+                         bucket_iterator_t bucket_iterator_end,
+                         list_iterator_t list_iterator
+                    )
+                        : _bucket_iterator_begin(bucket_iterator_begin),
+                         _bucket_iterator_end(bucket_iterator_begin),
+                         _list_iterator(list_iterator)
+                    {
+                         // If the current bucket is empty, move to the first non-empty bucket
+                         while (_bucket_iterator_begin not_eq bucket_iterator_end and _list_iterator == _bucket_iterator_begin->end()) {
+                              ++_bucket_iterator_begin;
+                              if (_bucket_iterator_begin not_eq bucket_iterator_end) _list_iterator = _bucket_iterator_begin->begin();
+                         }
+                    }
+
+                    reference operator *() const {
+                         return *_list_iterator;
+                    }
+                    pointer operator ->() const {
+                         return &(*_list_iterator);
+                    }
+                    iterator& operator ++() {
+                        ++_list_iterator;
+                    
+                         // If we reach the end of the current bucket, move to the next non-empty bucket
+                         while (_list_iterator == _bucket_iterator_begin->end()) {
+                              ++_bucket_iterator_begin;
+                              if (_bucket_iterator_begin == _bucket_iterator_end) break; // If we're at the end of the bucket list
+                              _list_iterator = _bucket_iterator_begin->begin();
+                         }
+                         return *this;
+                    }
+                    iterator operator ++(int) {
+                         iterator temp = *this;
+                         ++(*this);
+                         return temp;
+                    }
+
+                    iterator& operator --() {
+                         if (_list_iterator == _bucket_iterator_begin->begin()) {
+                              // Move to the previous bucket that is non-empty
+                              do {
+                                   --_bucket_iterator_begin;
+                              } while (_bucket_iterator_begin->empty());
+                              _list_iterator = --_bucket_iterator_begin->end();
+                         } 
+                         else {
+                         --_list_iterator;
+                         }
+                         return *this;
+                    }
+                    iterator operator --(int) {
+                         iterator temp = *this;
+                         --(*this);
+                         return temp;
+                    
+                    }
+                    bool operator ==(const iterator& other) const {
+                         return !(this != other);
+                    }
+                    bool operator !=(const iterator& other) const {
+                         return (
+                                   _bucket_iterator_begin not_eq other._bucket_iterator_begin 
+                                   or
+                                   _list_iterator not_eq other._list_iterator
+                         );  
+                    }
+
+               private:
+                    bucket_iterator_t _bucket_iterator_begin, _bucket_iterator_end;
+                    list_iterator_t _list_iterator;
+          };
+
+          iterator begin() {
+               auto bucket_iter = _buffer.begin();
+               auto bucket_end = _buffer.end();
+               typename iterator::list_iterator_t list_end_iterator{nullptr};
+
+               typename iterator::list_iterator_t list_iter = (
+                    bucket_iter not_eq bucket_end and !bucket_iter->empty()) ?
+                    bucket_iter->begin() : list_end_iterator;
+
+               return iterator(bucket_iter, bucket_end, list_iter);
+          }
+
+          iterator end() {
+               typename iterator::list_iterator_t list_end_iterator{nullptr};
+               return iterator(_buffer.end(), _buffer.end(), list_end_iterator);
+               //return iterator(_buffer.end(), _buffer.end(), _buffer.end()->end());
+          }
+
      private:     
           size_t _hash(const Key &key){
                return Hash{}(key) % _capacity;
@@ -408,5 +512,9 @@ int main(){
      for (int i = 0; i < 7; i++)
           table.emplace(i, 2 * i);
      
-     std::cout << table.size();
+     for (auto it = table.begin(); it != table.end(); it++){
+          
+          std::cout << "{"<< it->first << it->second << "}\n";
+     }
+     std::cout << "finish" << std::endl;
 }    
