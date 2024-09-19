@@ -137,29 +137,34 @@ class list{
           dl_node<T> *_head = nullptr, *_tail = nullptr;
 };
  
-template <typename T>
-class dynamic_array{
-     public:
-          dynamic_array() = default;
 
-          dynamic_array(size_t capacity)
+///solution: this class should go into ds::utils namespace and have a method increase_size(size_t by)
+//in fact its  even better to put it into something like ds::_details so that it won't get in the way
+//the hash_table structure will increment the size of the structure upon addition of new elements
+
+template <typename T>
+class dynamic_index_array{
+     public:
+          dynamic_index_array() = default;
+
+          dynamic_index_array(size_t capacity)
                : _array(new T[capacity]), _capacity(capacity), _size(0)
           {               
                assert(capacity > 0);
           }
 
-          dynamic_array(std::initializer_list<T> list){
+          dynamic_index_array(std::initializer_list<T> list){
                reserve(list.size());
                std::move(list.begin(), list.end(), _array);
           }
 
-          dynamic_array(dynamic_array&& other) noexcept
+          dynamic_index_array(dynamic_index_array&& other) noexcept
                : _size(other._size), _capacity(other._capacity), _array(other._array) {
                other._array = nullptr;
                other._size = 0;
                other._capacity = 0;
           }
-          dynamic_array& operator=(dynamic_array&& other) noexcept {
+          dynamic_index_array& operator=(dynamic_index_array&& other) noexcept {
                if (this != &other) {
                     delete[] _array; 
                     _array = other._array;
@@ -171,17 +176,19 @@ class dynamic_array{
                }
                return *this;
           }
-          template<typename Arg>
-          void push_back(Arg &&value){
-               if (_size == _capacity) reserve((_capacity == 0 ? 1 : _capacity) * 2);
-               _array[_size++] = std::forward<T>(value);
-          }
 
+          template<typename Arg>
+          void assign(size_t index, Arg &&arg){
+               if (index > _capacity){
+                    if (index )
+               }
+          }
           T& operator[](size_t index){
                if (index >= _capacity)
                     throw std::out_of_range("index out of bounds");
                return _array[index];
           }
+           
           void reserve(size_t capacity){
                if (capacity > _capacity) {
                     T* new_array = new T[capacity];
@@ -203,6 +210,7 @@ class dynamic_array{
                return _size;
           }
 
+        
           class iterator {
           public:
                using iterator_category = std::random_access_iterator_tag;
@@ -291,13 +299,13 @@ class dynamic_array{
                }
           private:
                T* _ptr = nullptr;
-     };   
+          };   
 
 
           iterator begin() const { return iterator(_array); }
           iterator end() const { return iterator(_array + _size); }
 
-          ~dynamic_array(){
+          ~dynamic_index_array(){
                delete[] _array;
           }
           
@@ -340,9 +348,9 @@ class hash_table{
           void emplace(Arg1&& key, Arg2&& value) {
                if (_size + 1 > _capacity * _load_factor) _rehash(_capacity * 2);
                
-               size_t bucket_index = _hash(key);
-               _buffer[bucket_index].push_back(std::make_pair(std::forward<Arg1>(key), std::forward<Arg2>(value)));
-               _size++;
+               // size_t bucket_index = _hash(key);
+               // _buffer[bucket_index].push_back(std::make_pair(std::forward<Arg1>(key), std::forward<Arg2>(value)));
+               // _size++;
           }
 
           void remove(const Key &key){
@@ -355,7 +363,7 @@ class hash_table{
 
           Value& at(const Key &key){
                size_t bucket_index = _hash(key);
-               bucket_t &bucket = _buffer[bucket_index];
+               const bucket_t &bucket = _buffer[bucket_index];
                auto iterator = std::find_if(bucket.begin(), bucket.end(),
                     [&key](const item_t& item){
                          return item.first == key;
@@ -387,7 +395,7 @@ class hash_table{
                     using pointer = value_type *;
                     using reference = value_type &;
 
-                    using bucket_iterator_t = typename dynamic_array<bucket_t>::iterator;
+                    using bucket_iterator_t = typename dynamic_index_array<bucket_t>::iterator;
                     using list_iterator_t = typename list<item_t>::iterator;
 
                     iterator(
@@ -490,12 +498,12 @@ class hash_table{
                return Hash{}(key) % _capacity;
           }
           void _rehash(size_t new_capacity){
-               dynamic_array<bucket_t> new_buffer(new_capacity);
+               dynamic_index_array<bucket_t> new_buffer(new_capacity);
                
                for (size_t i = 0; i < _capacity; i++) {
-                    for (auto&& item : _buffer[i]) {
+                    for (item_t& item : _buffer.acquire(i)) {
                          size_t new_index = Hash{}(item.first) % new_capacity;
-                         new_buffer[new_index].push_back(std::move(item));
+                         new_buffer[new_index].push_back(item);
                     }
                }
                _buffer = std::move(new_buffer);
@@ -504,18 +512,18 @@ class hash_table{
           
           float _load_factor = 0.75f;
           size_t _capacity = 0, _size = 0;
-          dynamic_array<bucket_t> _buffer;
+          dynamic_index_array<bucket_t> _buffer;
 
           constexpr static size_t _default_bucket_number = 8; // the number of buckets used by default if an empty constructor is called
 };
  
 int main(){
      hash_table<int, int> table;
-     for (int i = 1; i < 8; i++)
+     for (int i = 1; i < 5; i++)
           table.emplace(i, 2 * i);
      
      
-     for (int i = 1; i < 8; i++)
+     for (int i = 1; i < 5; i++)
           std::cout << table.at(i) << std::endl;
 
      // for (auto it = table.begin(); it != table.end(); it++){
@@ -526,5 +534,5 @@ int main(){
 
 
      std::cout << "finish" << std::endl;
-    
+ 
 }    
