@@ -70,6 +70,9 @@ class list{
                }
           }
 
+          bool empty() const{
+               return _head;
+          }
           void clear(){
                for (auto *previous = _head; previous; previous = previous->next) 
                     delete previous;
@@ -84,7 +87,7 @@ class list{
                using pointer = value_type *;
                using reference = value_type &;
 
-              
+               iterator() = default;
                iterator(dl_node<T> *head) : current(head) {}
 
                T& operator*() const {
@@ -122,7 +125,7 @@ class list{
                }
                
           private:
-              dl_node<T> *current;
+              dl_node<T> *current = nullptr;
           };
 
 
@@ -208,6 +211,7 @@ class dynamic_array{
                using pointer = value_type *;
                using reference = value_type &;
 
+               iterator() = default;
                iterator(T* ptr) : _ptr(ptr) {}
 
                reference operator *() const { 
@@ -286,7 +290,7 @@ class dynamic_array{
                    return _ptr >= other._ptr;
                }
           private:
-               T* _ptr;
+               T* _ptr = nullptr;
      };   
 
 
@@ -334,15 +338,10 @@ class hash_table{
 
           template<typename Arg1, typename Arg2>
           void emplace(Arg1&& key, Arg2&& value) {
-               if (_size + 1 > _capacity * _load_factor){ // check if rehashing is needed
-                    _rehash(_capacity * 2);
-               }
-               else{
-                    size_t bucket_index = _hash(key);
-                    _buffer[bucket_index].push_back(
-                        std::make_pair(std::forward<Arg1>(key), std::forward<Arg2>(value))
-                    );
-               }
+               if (_size + 1 > _capacity * _load_factor) _rehash(_capacity * 2);
+               
+               size_t bucket_index = _hash(key);
+               _buffer[bucket_index].push_back(std::make_pair(std::forward<Arg1>(key), std::forward<Arg2>(value)));
                _size++;
           }
 
@@ -396,15 +395,15 @@ class hash_table{
                          bucket_iterator_t bucket_iterator_end,
                          list_iterator_t list_iterator
                     )
-                        : _bucket_iterator_begin(bucket_iterator_begin),
-                         _bucket_iterator_end(bucket_iterator_begin),
+                        : _bucket_iterator(bucket_iterator_begin),
+                         _bucket_end_iterator(bucket_iterator_begin),
                          _list_iterator(list_iterator)
                     {
                          // If the current bucket is empty, move to the first non-empty bucket
-                         while (_bucket_iterator_begin not_eq bucket_iterator_end and _list_iterator == _bucket_iterator_begin->end()) {
-                              ++_bucket_iterator_begin;
-                              if (_bucket_iterator_begin not_eq bucket_iterator_end) _list_iterator = _bucket_iterator_begin->begin();
-                         }
+                         // while (_bucket_iterator not_eq bucket_iterator_end and _list_iterator == _bucket_iterator->end()) {
+                         //      ++_bucket_iterator;
+                         //      if (_bucket_iterator not_eq bucket_iterator_end) _list_iterator = _bucket_iterator->begin();
+                         // }
                     }
 
                     reference operator *() const {
@@ -414,13 +413,12 @@ class hash_table{
                          return &(*_list_iterator);
                     }
                     iterator& operator ++() {
-                        ++_list_iterator;
+                        _list_iterator++;
                     
                          // If we reach the end of the current bucket, move to the next non-empty bucket
-                         while (_list_iterator == _bucket_iterator_begin->end()) {
-                              ++_bucket_iterator_begin;
-                              if (_bucket_iterator_begin == _bucket_iterator_end) break; // If we're at the end of the bucket list
-                              _list_iterator = _bucket_iterator_begin->begin();
+                         while (_list_iterator == _bucket_iterator->end() and _bucket_iterator != _bucket_end_iterator) {
+                              _bucket_iterator++;
+                              _list_iterator = _bucket_iterator->begin();
                          }
                          return *this;
                     }
@@ -431,15 +429,16 @@ class hash_table{
                     }
 
                     iterator& operator --() {
-                         if (_list_iterator == _bucket_iterator_begin->begin()) {
+                         if (_list_iterator == _bucket_iterator->begin()) {
                               // Move to the previous bucket that is non-empty
                               do {
-                                   --_bucket_iterator_begin;
-                              } while (_bucket_iterator_begin->empty());
-                              _list_iterator = --_bucket_iterator_begin->end();
+                                   --_bucket_iterator;
+                              } while (_bucket_iterator->empty());
+
+                              _list_iterator = --_bucket_iterator->end();
                          } 
                          else {
-                         --_list_iterator;
+                              _list_iterator--;
                          }
                          return *this;
                     }
@@ -454,33 +453,36 @@ class hash_table{
                     }
                     bool operator !=(const iterator& other) const {
                          return (
-                                   _bucket_iterator_begin not_eq other._bucket_iterator_begin 
-                                   or
-                                   _list_iterator not_eq other._list_iterator
+                              _bucket_iterator not_eq other._bucket_iterator 
+                              or
+                              _list_iterator not_eq other._list_iterator
                          );  
                     }
 
                private:
-                    bucket_iterator_t _bucket_iterator_begin, _bucket_iterator_end;
+                    bucket_iterator_t _bucket_iterator, _bucket_end_iterator;
                     list_iterator_t _list_iterator;
           };
 
           iterator begin() {
                auto bucket_iter = _buffer.begin();
                auto bucket_end = _buffer.end();
-               typename iterator::list_iterator_t list_end_iterator{nullptr};
+               auto list_iter = bucket_iter->begin();
 
-               typename iterator::list_iterator_t list_iter = (
-                    bucket_iter not_eq bucket_end and !bucket_iter->empty()) ?
-                    bucket_iter->begin() : list_end_iterator;
-
+              
+               while (bucket_iter != bucket_end){
+                    while(list_iter == bucket_iter->end())
+                         {
+                              bucket_iter++;
+                              list_iter = bucket_iter->begin();
+                         }
+               }
+             
                return iterator(bucket_iter, bucket_end, list_iter);
           }
 
           iterator end() {
-               typename iterator::list_iterator_t list_end_iterator{nullptr};
-               return iterator(_buffer.end(), _buffer.end(), list_end_iterator);
-               //return iterator(_buffer.end(), _buffer.end(), _buffer.end()->end());
+               return iterator(_buffer.end(), _buffer.end(), typename iterator::list_iterator_t{});
           }
 
      private:     
@@ -491,7 +493,7 @@ class hash_table{
                dynamic_array<bucket_t> new_buffer(new_capacity);
                
                for (size_t i = 0; i < _capacity; i++) {
-                    for (auto& item : _buffer[i]) {
+                    for (auto&& item : _buffer[i]) {
                          size_t new_index = Hash{}(item.first) % new_capacity;
                          new_buffer[new_index].push_back(std::move(item));
                     }
@@ -509,12 +511,20 @@ class hash_table{
  
 int main(){
      hash_table<int, int> table;
-     for (int i = 0; i < 7; i++)
+     for (int i = 1; i < 8; i++)
           table.emplace(i, 2 * i);
      
-     for (auto it = table.begin(); it != table.end(); it++){
-          
-          std::cout << "{"<< it->first << it->second << "}\n";
-     }
+     
+     for (int i = 1; i < 8; i++)
+          std::cout << table.at(i) << std::endl;
+
+     // for (auto it = table.begin(); it != table.end(); it++){
+     //      std::cout << "{"<< it->first << it->second << "}\n";
+     // }
+     auto it = table.begin();
+     std::cout << (it->first);
+
+
      std::cout << "finish" << std::endl;
+    
 }    
