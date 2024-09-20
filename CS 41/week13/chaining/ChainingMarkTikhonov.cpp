@@ -9,9 +9,9 @@
 #include <functional>
 #include <cassert>
 
-template<typename T>
-struct dl_node{
-     public:
+namespace ds{
+     template<typename T>
+     struct dl_node{
           template<typename Arg>
           dl_node(Arg &&val) : data{std::forward<Arg>(val)}
           {
@@ -29,11 +29,10 @@ struct dl_node{
           T data;
           dl_node<T> *previous = nullptr;
           dl_node<T> *next = nullptr;
-};
+     };
 
-
-template<typename T>
-class list{
+     template<typename T>
+     class list{
      public:
           template<typename Arg>
           void push_back(Arg &&value){
@@ -135,15 +134,18 @@ class list{
           ~list(){ clear(); }
      private:
           dl_node<T> *_head = nullptr, *_tail = nullptr;
-};
+     };
  
+}
+
 
 ///solution: this class should go into ds::utils namespace and have a method increase_size(size_t by)
 //in fact its  even better to put it into something like ds::_details so that it won't get in the way
 //the hash_table structure will increment the size of the structure upon addition of new elements
 
-template <typename T>
-class dynamic_index_array{
+namespace ds::_utils{
+     template <typename T>
+     class dynamic_index_array{
      public:
           dynamic_index_array() = default;
 
@@ -313,9 +315,12 @@ class dynamic_index_array{
           T *_array = nullptr;
           size_t _capacity = 0, _size = 0;
 
-};
+     };
 
-template<
+}
+
+namespace ds{
+     template<
      typename Key,
      typename Value,
      typename Hash = std::hash<Key>
@@ -325,7 +330,6 @@ class hash_table{
      using bucket_t = list<item_t>;
 
      public:
-
           hash_table()
                : _capacity(_default_bucket_number),
                  _buffer(_default_bucket_number)
@@ -407,11 +411,6 @@ class hash_table{
                          _bucket_end_iterator(bucket_iterator_begin),
                          _list_iterator(list_iterator)
                     {
-                         // If the current bucket is empty, move to the first non-empty bucket
-                         // while (_bucket_iterator not_eq bucket_iterator_end and _list_iterator == _bucket_iterator->end()) {
-                         //      ++_bucket_iterator;
-                         //      if (_bucket_iterator not_eq bucket_iterator_end) _list_iterator = _bucket_iterator->begin();
-                         // }
                     }
 
                     reference operator *() const {
@@ -515,10 +514,12 @@ class hash_table{
           dynamic_index_array<bucket_t> _buffer;
 
           constexpr static size_t _default_bucket_number = 8; // the number of buckets used by default if an empty constructor is called
-};
+     };
  
+}
+
 int main(){
-     hash_table<int, int> table;
+     ds::hash_table<int, int> table;
      for (int i = 1; i < 5; i++)
           table.emplace(i, 2 * i);
      
