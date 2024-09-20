@@ -1,5 +1,7 @@
 import java.util.Scanner;
 import java.util.Random;
+
+
 //import Plot;
 /**
  * Descritpion: Lecture code
@@ -23,7 +25,7 @@ public class Program {
             canvasHeight = newHeight;
         }
         public void plot(function f, double...args){
-            
+
         } 
 
         private Draw screen;
