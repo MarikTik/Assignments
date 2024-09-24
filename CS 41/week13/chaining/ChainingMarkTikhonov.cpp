@@ -63,8 +63,7 @@ namespace ds{
                     _tail->attach_next(node);
                     _tail = node;
                }
-          }         
-
+          }   
 
           /// @brief inserts a new element at the beginning of the list
           /// @tparam Arg the type of the value to be inserted
@@ -86,7 +85,7 @@ namespace ds{
                     _head = node;
                }
           }
-          
+
           /// @brief removes the first n elements from an array that satisfy a predicate
           /// @tparam Predicate the type of the predicate to be used
           /// @param predicate the predicate to be used to remove elements
@@ -112,6 +111,7 @@ namespace ds{
                     }
                }
           }
+
           bool empty() const{
                return _head;
           }
@@ -121,7 +121,7 @@ namespace ds{
                     delete previous;
                _head = _tail = nullptr;
           }
-          
+
           class iterator {
                public:
                     using iterator_category = std::bidirectional_iterator_tag;
@@ -145,11 +145,10 @@ namespace ds{
                    dl_node<T> *current = nullptr;
           };
 
-
           iterator begin() const { return iterator(_head); }
           iterator end() const { return iterator(nullptr); }
-         
           ~linked_list(){ clear(); }
+
      private:
           dl_node<T> *_head = nullptr, *_tail = nullptr;
      };
@@ -288,7 +287,7 @@ namespace ds{
 }
 
 namespace ds{
-     /// @brief an ordered list that has a fixed capacity and when the list is full, the new elements are added at the beginning of the list
+     /// @brief an ordered list that has a fixed capacity and when the list is full, the new elements are added from the beginning of the list
      /// @tparam T type of the elements to be stored in the list
      template<typename T>
      class circular_list : public _utils::ordered_buffer<T>{
@@ -373,8 +372,8 @@ namespace ds{
                     iterator operator --(int) {iterator temp = *this; --(*this); return temp;}
                     iterator &operator +=(difference_type n) {_it += n; return *this;}
                     iterator &operator -=(difference_type n) {_it -= n; return *this;}
-                    iterator operator +(difference_type n) const {return iterator(this->ptr + *_it + n, _it + n);}
-                    iterator operator -(difference_type n) const {return iterator(this->ptr + *_it - n, _it - n);}
+                    iterator operator +(difference_type n) const {return iterator(_ptr + *_it + n, _it + n);}
+                    iterator operator -(difference_type n) const {return iterator(_ptr + *_it - n, _it - n);}
                     bool operator ==(const iterator &other) const {return _ptr == other._ptr and _it == other._it;}
                     bool operator !=(const iterator &other) const {return not (*this == other);}
                     bool operator <(const iterator &other) const {return _ptr + *_it < other._ptr + *other._it;}
@@ -510,7 +509,7 @@ class hash_table{
                               // If we've reached the end of all buckets, break
                               break;
                          }
-                         _list_iterator = _bucket_iterator->begin();  // Move to the start of the new bucket
+                              _list_iterator = _bucket_iterator->begin();  // Move to the start of the new bucket
                          }
 
                          return *this;
@@ -561,19 +560,18 @@ class hash_table{
                auto bucket_end = _buckets.end();
 
                while (bucket_iter not_eq bucket_end) {
-                   auto list_iter = bucket_iter->begin();
+                    auto list_iter = bucket_iter->begin();
 
                     if (list_iter not_eq bucket_iter->end()) 
                          return iterator(bucket_iter, bucket_end, list_iter);
 
-                   bucket_iter++;
+                    bucket_iter++;
                }
-
                return end();
           }
 
           iterator end() {
-               return iterator(_buckets.end(), _buckets.end(), typename iterator::item_iterator_t{nullptr});
+               return iterator(_buckets.end(), _buckets.end(), (_buckets.end() -1)->end());
           }
 
      private:     
