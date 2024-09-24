@@ -238,6 +238,8 @@ namespace ds::_utils{
 
 
 namespace ds{
+     /// @brief list that keeps the elements in the order they were added
+     /// @tparam T type of the elements to be stored in the list
      template<typename T>
      class ordered_list : public _utils::ordered_buffer<T>{
           public:
@@ -286,6 +288,8 @@ namespace ds{
 }
 
 namespace ds{
+     /// @brief an ordered list that has a fixed capacity and when the list is full, the new elements are added at the beginning of the list
+     /// @tparam T type of the elements to be stored in the list
      template<typename T>
      class circular_list : public _utils::ordered_buffer<T>{
           public:
@@ -388,204 +392,203 @@ namespace ds{
      };
 }
 
-// namespace ds{
-//      template<
-//      typename Key,
-//      typename Value,
-//      typename Hash = std::hash<Key>
-// >
-// class hash_table{
-//      using item_t = std::pair<Key, Value>;
-//      using bucket_t = list<item_t>;
+namespace ds{
+template<
+     typename Key,
+     typename Value,
+     typename Hash = std::hash<Key>
+>
+class hash_table{
+     using item_t = std::pair<Key, Value>;
+     using bucket_t = linked_list<item_t>;
 
-//      public:
-//           hash_table()
-//                : _capacity(_default_bucket_number),
-//                  _buffer(_default_bucket_number)
-//           {
-//           }
-//           hash_table(size_t capacity)
-//                : _capacity(capacity),
-//                _buffer(capacity)
-//           {
-//           }
+     public:
+          hash_table()
+               : _capacity(_default_bucket_number),
+                 _buffer(_default_bucket_number)
+          {
+          }
+          hash_table(size_t capacity)
+               : _capacity(capacity),
+               _buffer(capacity)
+          {
+          }
 
-//           hash_table(std::initializer_list<item_t> items)
-//                : _capacity(items.size()),
-//                _buffer(std::move(items)),
-//                _size(_capacity)
-//           {
-//           }
+          hash_table(std::initializer_list<item_t> items)
+               : _capacity(items.size()),
+               _buffer(std::move(items)),
+               _size(_capacity)
+          {
+          }
 
-//           template<typename Arg1, typename Arg2>
-//           void emplace(Arg1&& key, Arg2&& value) {
-//                if (_size + 1 > _capacity * _load_factor) _rehash(_capacity * 2);
-               
-//                // size_t bucket_index = _hash(key);
-//                // _buffer[bucket_index].push_back(std::make_pair(std::forward<Arg1>(key), std::forward<Arg2>(value)));
-//                // _size++;
-//           }
+          template<typename Arg1, typename Arg2>
+          void emplace(Arg1&& key, Arg2&& value) {
+               if (_size + 1 > _capacity * _load_factor) _rehash(_capacity * 2); 
+               size_t bucket_index = _hash(key);
+               _buffer[bucket_index].push_back(std::make_pair(std::forward<Arg1>(key), std::forward<Arg2>(value)));
+               _size++;
+          }
 
-//           void remove(const Key &key){
-//                size_t bucket_index = _hash(key);
-//                _buffer[bucket_index].remove_if([&key](const auto& item){
-//                     return item.first == key;
-//                });
-//                _size--;
-//           }
+          void remove(const Key &key){
+               size_t bucket_index = _hash(key);
+               _buffer[bucket_index].remove_if([&key](const auto& item){
+                    return item.first == key;
+               });
+               _size--;
+          }
 
-//           Value& at(const Key &key){
-//                size_t bucket_index = _hash(key);
-//                const bucket_t &bucket = _buffer[bucket_index];
-//                auto iterator = std::find_if(bucket.begin(), bucket.end(),
-//                     [&key](const item_t& item){
-//                          return item.first == key;
-//                     }
-//                );
-//                if (iterator == bucket.end()) throw std::out_of_range("key error: key not found in hash table");
-//                return (*iterator).second;
-//           }
+          Value& at(const Key &key){
+               size_t bucket_index = _hash(key);
+               const bucket_t &bucket = _buffer[bucket_index];
+               auto iterator = std::find_if(bucket.begin(), bucket.end(),
+                    [&key](const item_t& item){
+                         return item.first == key;
+                    }
+               );
+               if (iterator == bucket.end()) throw std::out_of_range("key error: key not found in hash table");
+               return (*iterator).second;
+          }
 
-//           bool contains(const Key &key){
-//                size_t bucket_index = _hash(key);
-//                bucket_t &bucket = _buffer[bucket_index];
-//                auto iterator = std::find_if(bucket.begin(), bucket.end(),
-//                     [&key](const item_t& item){
-//                          return item.first == key;
-//                     }
-//                );
-//                return iterator != bucket.end();
-//           }
-//           inline size_t size() const{
-//                return _size;
-//           }
+          bool contains(const Key &key){
+               size_t bucket_index = _hash(key);
+               bucket_t &bucket = _buffer[bucket_index];
+               auto iterator = std::find_if(bucket.begin(), bucket.end(),
+                    [&key](const item_t& item){
+                         return item.first == key;
+                    }
+               );
+               return iterator != bucket.end();
+          }
+          inline size_t size() const{
+               return _size;
+          }
 
-//           class iterator{
-//                public:
-//                     using iterator_category = std::bidirectional_iterator_tag;
-//                     using value_type = item_t;
-//                     using difference_type = std::ptrdiff_t;
-//                     using pointer = value_type *;
-//                     using reference = value_type &;
+          class iterator{
+               public:
+                    using iterator_category = std::bidirectional_iterator_tag;
+                    using value_type = item_t;
+                    using difference_type = std::ptrdiff_t;
+                    using pointer = value_type *;
+                    using reference = value_type &;
 
-//                     using bucket_iterator_t = typename dynamic_index_array<bucket_t>::iterator;
-//                     using list_iterator_t = typename list<item_t>::iterator;
+                    using bucket_iterator_t = typename unordered_list<bucket_t>::iterator;
+                    using list_iterator_t = typename linked_list<item_t>::iterator;
 
-//                     iterator(
-//                          bucket_iterator_t bucket_iterator_begin,
-//                          bucket_iterator_t bucket_iterator_end,
-//                          list_iterator_t list_iterator
-//                     )
-//                         : _bucket_iterator(bucket_iterator_begin),
-//                          _bucket_end_iterator(bucket_iterator_begin),
-//                          _list_iterator(list_iterator)
-//                     {
-//                     }
+                    iterator(
+                         bucket_iterator_t bucket_iterator_begin,
+                         bucket_iterator_t bucket_iterator_end,
+                         list_iterator_t list_iterator
+                    )
+                        : _bucket_iterator(bucket_iterator_begin),
+                         _bucket_end_iterator(bucket_iterator_begin),
+                         _list_iterator(list_iterator)
+                    {
+                    }
 
-//                     reference operator *() const {
-//                          return *_list_iterator;
-//                     }
-//                     pointer operator ->() const {
-//                          return &(*_list_iterator);
-//                     }
-//                     iterator& operator ++() {
-//                         _list_iterator++;
+                    reference operator *() const {
+                         return *_list_iterator;
+                    }
+                    pointer operator ->() const {
+                         return &(*_list_iterator);
+                    }
+                    iterator& operator ++() {
+                        _list_iterator++;
                     
-//                          // If we reach the end of the current bucket, move to the next non-empty bucket
-//                          while (_list_iterator == _bucket_iterator->end() and _bucket_iterator != _bucket_end_iterator) {
-//                               _bucket_iterator++;
-//                               _list_iterator = _bucket_iterator->begin();
-//                          }
-//                          return *this;
-//                     }
-//                     iterator operator ++(int) {
-//                          iterator temp = *this;
-//                          ++(*this);
-//                          return temp;
-//                     }
+                         // If we reach the end of the current bucket, move to the next non-empty bucket
+                         while (_list_iterator == _bucket_iterator->end() and _bucket_iterator != _bucket_end_iterator) {
+                              _bucket_iterator++;
+                              _list_iterator = _bucket_iterator->begin();
+                         }
+                         return *this;
+                    }
+                    iterator operator ++(int) {
+                         iterator temp = *this;
+                         ++(*this);
+                         return temp;
+                    }
 
-//                     iterator& operator --() {
-//                          if (_list_iterator == _bucket_iterator->begin()) {
-//                               // Move to the previous bucket that is non-empty
-//                               do {
-//                                    --_bucket_iterator;
-//                               } while (_bucket_iterator->empty());
+                    iterator& operator --() {
+                         if (_list_iterator == _bucket_iterator->begin()) {
+                              // Move to the previous bucket that is non-empty
+                              do {
+                                   --_bucket_iterator;
+                              } while (_bucket_iterator->empty());
 
-//                               _list_iterator = --_bucket_iterator->end();
-//                          } 
-//                          else {
-//                               _list_iterator--;
-//                          }
-//                          return *this;
-//                     }
-//                     iterator operator --(int) {
-//                          iterator temp = *this;
-//                          --(*this);
-//                          return temp;
+                              _list_iterator = --_bucket_iterator->end();
+                         } 
+                         else {
+                              _list_iterator--;
+                         }
+                         return *this;
+                    }
+                    iterator operator --(int) {
+                         iterator temp = *this;
+                         --(*this);
+                         return temp;
                     
-//                     }
-//                     bool operator ==(const iterator& other) const {
-//                          return !(this != other);
-//                     }
-//                     bool operator !=(const iterator& other) const {
-//                          return (
-//                               _bucket_iterator not_eq other._bucket_iterator 
-//                               or
-//                               _list_iterator not_eq other._list_iterator
-//                          );  
-//                     }
+                    }
+                    bool operator ==(const iterator& other) const {
+                         return !(this != other);
+                    }
+                    bool operator !=(const iterator& other) const {
+                         return (
+                              _bucket_iterator not_eq other._bucket_iterator 
+                              or
+                              _list_iterator not_eq other._list_iterator
+                         );  
+                    }
 
-//                private:
-//                     bucket_iterator_t _bucket_iterator, _bucket_end_iterator;
-//                     list_iterator_t _list_iterator;
-//           };
+               private:
+                    bucket_iterator_t _bucket_iterator, _bucket_end_iterator;
+                    list_iterator_t _list_iterator;
+          };
 
-//           iterator begin() {
-//                auto bucket_iter = _buffer.begin();
-//                auto bucket_end = _buffer.end();
-//                auto list_iter = bucket_iter->begin();
+          iterator begin() {
+               auto bucket_iter = _buffer.begin();
+               auto bucket_end = _buffer.end();
+               auto list_iter = bucket_iter->begin();
 
               
-//                while (bucket_ite>r != bucket_end){
-//                     while(list_iter == bucket_iter->end())
-//                          {
-//                               bucket_iter++;
-//                               list_iter = bucket_iter->begin();
-//                          }
-//                }
+               while (bucket_iter != bucket_end){
+                    while(list_iter == bucket_iter->end())
+                         {
+                              bucket_iter++;
+                              list_iter = bucket_iter->begin();
+                         }
+               }
              
-//                return iterator(bucket_iter, bucket_end, list_iter);
-//           }
+               return iterator(bucket_iter, bucket_end, list_iter);
+          }
 
-//           iterator end() {
-//                return iterator(_buffer.end(), _buffer.end(), typename iterator::list_iterator_t{});
-//           }
+          iterator end() {
+               return iterator(_buffer.end(), _buffer.end(), typename iterator::list_iterator_t{});
+          }
 
-//      private:     
-//           size_t _hash(const Key &key){
-//                return Hash{}(key) % _capacity;
-//           }
-//           void _rehash(size_t new_capacity){
-//                dynamic_index_array<bucket_t> new_buffer(new_capacity);
+     private:     
+          size_t _hash(const Key &key){
+               return Hash{}(key) % _capacity;
+          }
+          void _rehash(size_t new_capacity){
+               unordered_list<bucket_t> new_buffer(new_capacity);
                
-//                for (size_t i = 0; i < _capacity; i++) {
-//                     for (item_t& item : _buffer.acquire(i)) {
-//                          size_t new_index = Hash{}(item.first) % new_capacity;
-//                          new_buffer[new_index].push_back(item);
-//                     }
-//                }
-//                _buffer = std::move(new_buffer);
-//                _capacity = new_capacity;
-//           }
+               for (size_t i = 0; i < _capacity; i++) {
+                    for (item_t& item : _buffer.acquire(i)) {
+                         size_t new_index = Hash{}(item.first) % new_capacity;
+                         new_buffer[new_index].push_back(item);
+                    }
+               }
+               _buffer = std::move(new_buffer);
+               _capacity = new_capacity;
+          }
           
-//           float _load_factor = 0.75f;
-//           size_t _capacity = 0, _size = 0;
-//           dynamic_index_array<bucket_t> _buffer;
+          float _load_factor = 0.75f;
+          size_t _capacity = 0, _size = 0;
+          unordered_list<bucket_t> _buffer;
 
-//           constexpr static size_t _default_bucket_number = 8; // the number of buckets used by default if an empty constructor is called
-//      };
+          constexpr static size_t _default_bucket_number = 8; // the number of buckets used by default if an empty constructor is called
+     };
  
-// }
+}
 
 int main(){
      // ds::hash_table<int, int> table;
