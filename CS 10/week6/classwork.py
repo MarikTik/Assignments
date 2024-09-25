@@ -1,8 +1,10 @@
-if __name__ == '__main__':
-    # i = -1439
-    # while i <= 6:
-    #     print(i)
-    #     i += 17
-    
-    for i in range(243, -1, -3):
-        print(i)
+from random import uniform
+
+n = 0
+for i in range(int(1e6)):
+    x = uniform(0, 1)
+    y = uniform(0, 1)
+    if y > x:
+        n += 1
+
+print(n)
