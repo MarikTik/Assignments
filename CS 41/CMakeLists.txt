@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.22.1)
 project(proj_tester)
-add_executable(${PROJECT_NAME} week13/chaining/ChainingMarkTikhonov.cpp)
 
+add_subdirectory(week13/chaining)
 
 add_compile_options(
     -Wall

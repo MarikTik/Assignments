@@ -342,8 +342,8 @@ namespace ds{
           void reserve(size_t new_capacity){
                if (new_capacity <= this->capacity) return;
                T* new_buffer = new T[new_capacity];
-               for (auto it = _indexes.begin(); it != _indexes.end(); it++)
-                    new_buffer[*it] = std::move(_buffer[*it]);
+               for (const auto index : _indexes)
+                    new_buffer[index] = std::move(_buffer[index]);
                delete[] this->array;
                _buffer = new_buffer;
                _indexes.reserve(new_capacity);
@@ -372,8 +372,8 @@ namespace ds{
                     iterator operator --(int) {iterator temp = *this; --(*this); return temp;}
                     iterator &operator +=(difference_type n) {_it += n; return *this;}
                     iterator &operator -=(difference_type n) {_it -= n; return *this;}
-                    iterator operator +(difference_type n) const {return iterator(_ptr + *_it + n, _it + n);}
-                    iterator operator -(difference_type n) const {return iterator(_ptr + *_it - n, _it - n);}
+                    iterator operator +(difference_type n) const {return iterator(_ptr + *_it + n, _it + n);} // error here
+                    iterator operator -(difference_type n) const {return iterator(_ptr + *_it - n, _it - n);} // end here 
                     bool operator ==(const iterator &other) const {return _ptr == other._ptr and _it == other._it;}
                     bool operator !=(const iterator &other) const {return not (*this == other);}
                     bool operator <(const iterator &other) const {return _ptr + *_it < other._ptr + *other._it;}
@@ -497,23 +497,19 @@ class hash_table{
                          return &(*_list_iterator);
                     }
                     iterator& operator ++() {
-                         if (_list_iterator != _bucket_iterator->end()) {
-                              // Move within the current list
-                              ++_list_iterator;
-                         }               
-
-                         // If we reach the end of the current list, move to the next non-empty bucket
-                         while (_list_iterator == _bucket_iterator->end()) {
-                         ++_bucket_iterator;
-                         if (_bucket_iterator == _bucket_end_iterator) {
-                              // If we've reached the end of all buckets, break
-                              break;
+                         // Move forward within the current list if possible
+                         if (_list_iterator != _bucket_iterator->end()) ++_list_iterator;
+                         
+                         else while (_bucket_iterator != _bucket_end_iterator) {
+                                   ++_bucket_iterator;
+                                   if (_bucket_iterator != _bucket_end_iterator and not _bucket_iterator->empty()) {
+                                      _list_iterator = _bucket_iterator->begin();
+                                      break;
+                                   }
                          }
-                              _list_iterator = _bucket_iterator->begin();  // Move to the start of the new bucket
-                         }
-
                          return *this;
                     }
+ 
                     iterator operator ++(int) {
                          iterator temp = *this;
                          ++(*this);
@@ -522,18 +518,14 @@ class hash_table{
 
                     iterator& operator --() {
                          // Move back within the current list if possible
-                         if (_list_iterator != _bucket_iterator->begin()) {
-                              --_list_iterator;
-                         } 
-                         else {
-                              // Move back to the previous non-empty bucket
-                              while (_bucket_iterator != _bucket_end_iterator && _bucket_iterator != _bucket_iterator_begin) {
+                         if (_list_iterator != _bucket_iterator->begin()) --_list_iterator;
+                         
+                         else while (_bucket_iterator != _bucket_end_iterator && _bucket_iterator != _bucket_iterator_begin) {
                                    --_bucket_iterator;
                                    if (!_bucket_iterator->empty()) {
                                       _list_iterator = --_bucket_iterator->end();
                                       break;
                                    }
-                              }
                          }
                          return *this;
                     }
@@ -541,7 +533,6 @@ class hash_table{
                          iterator temp = *this;
                          --(*this);
                          return temp;
-                    
                     }
                     bool operator == (const iterator& other) const {
                          return _bucket_iterator == other._bucket_iterator and _list_iterator == other._list_iterator;
@@ -571,7 +562,7 @@ class hash_table{
           }
 
           iterator end() {
-               return iterator(_buckets.end(), _buckets.end(), (_buckets.end() -1)->end());
+               return iterator(_buckets.end(), _buckets.end(), (_buckets.end() - 1)->end());
           }
 
      private:     
@@ -602,20 +593,45 @@ class hash_table{
 }
 
 int main(){
-     ds::hash_table<int, int> table;
-     for (int i = 1; i < 5; i++)
-          table.emplace(i, 2 * i);
-     
-     
+     ds::unordered_list<int> list{10};
+     list [1] = 10;
+     list [2] = 20;
+     list [5] = 50;
+     list [8] = 80;
+     for (auto it = list.begin() + 1; it != list.end(); it++)
+          std::cout << *it << std::endl;
+     // ds::hash_table<int, int> table;
      // for (int i = 1; i < 5; i++)
-     //      std::cout << table.at(i) << std::endl;
-
-     std::cout << "begin" << std::endl;
+     //      table.emplace(i, 2 * i);
      
-     for (auto it = table.begin(); it != table.end(); it++)
-          std::cout << it->first << " " << it->second << std::endl;
+     
+     // // for (int i = 1; i < 5; i++)
+     // //      std::cout << table.at(i) << std::endl;
 
-     std::cout << "finish" << std::endl;
+     // std::cout << "begin\n" << std::endl;
+     // // std::cout << table.begin()->first << " " << table.begin()->second << std::endl;
+     // // for (auto it = table.begin(); it != table.end(); it++)
+     // //      std::cout << it->first << " " << it->second << std::endl;
+     // auto it = table.begin();
+     // std::cout << it->first;
+     // it ++;
+     // std::cout << it->first;
+     // it ++;
+     // std::cout << it->first;
+     // it ++;
+     // std::cout << it->first;
+     // it ++;
+     // std::cout << it->first;
+     // it ++;
+     // std::cout << it->first;
+     // it ++;
+     // std::cout << it->first;
+     // it ++;
+     // std::cout << it->first;
+     // it ++;
+     // std::cout << it->first;
+     
+     std::cout << "\nfinish" << std::endl;
 
 }    
  
