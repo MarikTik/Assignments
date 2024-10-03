@@ -6,7 +6,11 @@ namespace ds{
      struct dl_node{
           template<typename Arg>
           dl_node(Arg &&val) : data{std::forward<Arg>(val)}
+          {   
+          }
+          dl_node(dl_node &&other) : previous{other.previous}, next{other.next}, data{std::move(other.data)}
           {
+               other.previous = other.next = nullptr;
           }
           void attach_next(dl_node<T> *next_node){
                if (not next_node) return;
@@ -18,9 +22,9 @@ namespace ds{
                previous_node->next = this;
                this->previous = previous_node;
           }
-          T data;
           dl_node<T> *previous = nullptr;
           dl_node<T> *next = nullptr;
+          T data;
      };
 }
 #endif
