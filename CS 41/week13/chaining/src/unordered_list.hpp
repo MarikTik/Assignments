@@ -5,22 +5,10 @@
 #include "index_set.hpp"
 
 namespace ds{
+   
      template<typename T, typename Allocator>
      class unordered_list : public _utils::buffer<T, Allocator>{
      public:
-          
-          // unordered_list(unordered_list &&other) : _buffer(other._buffer), _indexes(std::move(other._indexes)) {}
-          // unordered_list &operator =(unordered_list &&other){
-          //      if (this == &other) return *this;
-          //      delete[] _buffer;
-          //      _buffer = other._buffer, _indexes = std::move(other._indexes);
-          //      other._buffer = nullptr;
-          //      return *this;
-          // }
-
-          using _utils::buffer<T, Allocator>::buffer;
-          using _utils::buffer<T, Allocator>::operator =;
-
           unordered_list() 
                : _utils::buffer<T, Allocator>::buffer(_default_capacity),
                  _indexes(_default_capacity),
@@ -34,11 +22,27 @@ namespace ds{
           {
           }
 
+          unordered_list(unordered_list &&other)
+               :    _utils::buffer<T, Allocator>::buffer(std::move(other._buffer)),
+                    _indexes(std::move(other._indexes)),
+                    _index_set(other._index_set) 
+          {
+               other.clear();  
+          }
+          unordered_list &operator =(unordered_list &&other){
+               if (this == &other) return *this;
+               _utils::buffer<T, Allocator>::operator =(std::move(other));
+               _indexes = std::move(other._indexes);
+               _index_set = other._index_set;
+               other.clear();
+          }
+         
           T &operator[](size_t index){
                if (index >= this->_capacity)
                     throw std::out_of_range("index out of bounds");
 
                if (not _index_set.test(index)){
+                    this->_size ++;
                     _index_set.set(index);
                     _indexes.push_back(index);
                }
@@ -54,9 +58,26 @@ namespace ds{
                this->_allocator.deallocate(this->_buffer, this->_capacity);
                this->_buffer = new_buffer;
                this->_capacity = new_capacity;
+               _index_set.reserve(new_capacity);
                _indexes.reserve(new_capacity);
           }
 
+          void shrink_to_fit(){
+               if (not this->_size) return;
+               auto last_index = *(_indexes.end() - 1);
+
+               if (last_index == this->_capacity - 1) return;
+               size_t new_capacity = last_index + 1;
+               T* new_buffer = this->_allocator.allocate(new_capacity);
+               for (const auto index : _indexes)
+                    new_buffer[index] = std::move(this->_buffer[index]);
+
+               this->_allocator.deallocate(this->_buffer, this->_capacity);
+               this->_buffer = new_buffer;
+               this->_capacity = new_capacity;
+               _index_set.shrink_to_fit();
+               _indexes.shrink_to_fit();
+          }
           class iterator{
                public:
                     using iterator_category = std::random_access_iterator_tag;
@@ -96,6 +117,13 @@ namespace ds{
           };   
           iterator begin() {return iterator(this->_buffer, _indexes.begin());}
           iterator end() {return iterator(this->_buffer, _indexes.end());}
+
+          void clear(){
+               _indexes.clear();
+               _index_set.clear();
+               _utils::buffer<T, Allocator>::clear();
+          }
+
      private:
           ordered_list<size_t> _indexes; // used for implementation of iterator
           ds::_utils::index_set _index_set; // this is used to check if an index is already in the list

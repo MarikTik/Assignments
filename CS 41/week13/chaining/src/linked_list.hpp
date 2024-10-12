@@ -2,29 +2,85 @@
 #define LINKED_LIST_HPP
 #include "dl_node.hpp"
 #include <limits>
+#include <type_traits>
 
 namespace ds{
-     template<typename T>
+     template<
+          typename T,
+          typename Allocator = std::allocator<dl_node<T>>
+     >
      class linked_list{
+          using allocator_t = Allocator;
+          using node_t = dl_node<T>;
+          using node_allocator_t = typename std::allocator_traits<Allocator>::template rebind_alloc<node_t>;
+          using node_allocator_traits_t = std::allocator_traits<node_allocator_t>;
+
+          template<typename Node, typename Value>
+          class basic_iterator;
      public:
 
-          linked_list() {};
-          linked_list(linked_list &&other) : _head(other._head), _tail(other._tail)
+          using iterator = basic_iterator<dl_node<T>, T>;
+          using const_iterator = basic_iterator<const dl_node<T>, const T>;
+
+          /// @brief Constructs an empty linked list.
+          linked_list() = default;
+
+          /// @brief Constructs a linked list as a copy of another list.
+          /// @param other The linked list to copy from.
+          linked_list(const linked_list &other) 
+               : _allocator(other._allocator),
+                 _node_allocator(other._node_allocator)
+          {
+               clear();
+               insert_range(other.begin(), other.end());
+          }
+
+          /// @brief Assigns the contents of another linked list to this one.
+          /// @param other The linked list to copy from.
+          /// @return Reference to the current object.
+          linked_list &operator =(const linked_list &other){
+               if (this != &other)
+               {
+                    clear();
+                    _allocator = other._allocator;
+                    _node_allocator = other._node_allocator;
+                    insert_range(other.begin(), other.end());
+               }
+               return *this;
+          }
+
+          /// @brief Constructs a linked list by moving the contents of another list.
+          /// @param other The linked list to move from.
+          linked_list(linked_list &&other) noexcept
+               : _head(other._head), _tail(other._tail),
+               _allocator(std::move(other._allocator)),
+               _node_allocator(std::move(other._node_allocator))
           {
                other._head = other._tail = nullptr;
           }
-          linked_list &operator = (linked_list &&other){
-               _head = other._head, _tail = other._tail;
-               other._head = other._tail = nullptr;
+
+          /// @brief Moves the contents of another linked list into this one.
+          /// @param other The linked list to move from.
+          /// @return Reference to the current object.
+          linked_list &operator = (linked_list &&other) noexcept{
+               if (this != &other) {
+                    clear();
+                    std::swap(_head, other._head);
+                    std::swap(_tail, other._tail);
+                    std::swap(_allocator, other._allocator);
+                    std::swap(_node_allocator, other._node_allocator);
+               }
+               return *this;
           }
 
-          /// @brief inserts a new element at the end of the list
-          /// @tparam Arg the type of the value to be inserted
-          /// @param value the value to be inserted
-          /// @return void
-          template<typename Arg>
-          void push_back(Arg &&value){
-               auto *node = new dl_node<T>(std::forward<Arg>(value));
+          /// @brief Inserts a new element at the end of the list.
+          /// @tparam Args The types of the arguments to construct the element.
+          /// @param args The arguments to forward to the element's constructor.
+          template<typename... Args>
+          void emplace_back(Args &&...args){
+               auto *node = _node_allocator.allocate(1);
+               node_allocator_traits_t::construct(_node_allocator, node, std::forward<Args>(args)...);
+
                if (not _head) {
                     _head = _tail = node;
                }
@@ -32,15 +88,16 @@ namespace ds{
                     _tail->attach_next(node);
                     _tail = node;
                }
-          }   
+          }
 
-          /// @brief inserts a new element at the beginning of the list
-          /// @tparam Arg the type of the value to be inserted
-          /// @param value the value to be inserted
-          /// @return void
-          template<typename Arg>
-          void push_front(Arg &&value){
-               auto *node = new dl_node<T>(std::forward<Arg>(value));
+          /// @brief Inserts a new element at the beginning of the list.
+          /// @tparam Args The types of the arguments to construct the element.
+          /// @param args The arguments to forward to the element's constructor.
+          template<typename... Args>
+          void emplace_front(Args &&...args){
+               auto *node = _node_allocator.allocate(1);
+               node_allocator_traits_t::construct(_node_allocator, node, std::forward<Args>(args)...);
+
                if (not _head){
                     _head = _tail = node;
                }
@@ -50,76 +107,181 @@ namespace ds{
                }
           }
 
-          /// @brief removes the first n elements from an array that satisfy a predicate
-          /// @tparam Predicate the type of the predicate to be used
-          /// @param predicate the predicate to be used to remove elements
-          /// @param n the number of elements to remove, if set to 0, all elements that satisfy the predicate will be removed
-          /// @return void
-          template<typename Predicate>
-          void remove(Predicate predicate, size_t n = 1){
-               if (empty()) return;
-               if (n == 0) n = std::numeric_limits<size_t>::max();
-               
-               for (dl_node<T> *_ptr = _head, *next; _ptr; _ptr = next){
-                    next = _ptr->next;
-                    if (std::invoke(predicate, _ptr->data)){
-                         if (_ptr == _head){
-                              delete _head;
-                              _head = next;
-                              if (_head) _head->previous = nullptr;
-                         }
-                         else{
-                              auto *previous = _ptr->previous;
-                              previous->attach_next(next);
-                              delete _ptr;
-                         }
-                         if (--n == 0) return;
-                    }
+          /// @brief Inserts a new element at the end of the list.
+          /// @tparam Arg The type of the value to be inserted.
+          /// @param value The value to be inserted.
+          template<typename Arg>
+          void push_back(Arg &&value){
+               emplace_back(std::forward<Arg>(value));
+          }   
+
+          /// @brief Inserts a new element at the beginning of the list.
+          /// @tparam Arg The type of the value to be inserted.
+          /// @param value The value to be inserted.
+          template<typename Arg>
+          void push_front(Arg &&value){
+               emplace_front(std::forward<Arg>(value));
+          }
+
+          /// @brief Inserts a range of elements into the list.
+          /// @tparam InputIterator The type of the input iterator.
+          /// @param begin Iterator to the beginning of the range.
+          /// @param end Iterator to the end of the range.
+          template<typename InputIterator>
+          void insert_range(InputIterator begin, InputIterator end){
+               for (auto it = begin; it != end; ++it){
+                    emplace_back(*it);
                }
           }
 
+          /// @brief Erases an element from the list at the specified iterator.
+          /// @param it The iterator pointing to the element to erase.
+          /// @return Iterator to the next element in the list.
+          iterator erase(iterator it) {
+               if (it == end()) return end();
+
+               dl_node<T>* node = it._ptr;
+               dl_node<T>* next = node->next;
+               dl_node<T>* previous = node->previous;
+
+               if (previous) previous->next = next;
+               else _head = next;
+
+               if (next) next->previous = previous;
+               else _tail = previous;
+
+               node_allocator_traits_t::destroy(_node_allocator, node);
+               _node_allocator.deallocate(node, 1);
+
+               return iterator(next);
+               
+          }    
+
+          /// @brief Returns the number of elements in the list.
+          /// @return The size of the list.
+          size_t size() const {
+               size_t count = 0;
+               for (auto* ptr = _head; ptr != nullptr; ptr = ptr->next) ++count;
+               return count;
+          }
+
+          /// @brief Checks if the list is empty.
+          /// @return True if the list is empty, false otherwise.
           bool empty() const{
                return not _head;
           }
 
+          /// @brief Clears the contents of the list.
           void clear(){
-               for (auto *_ptr = _head; _ptr;){
-                    auto *next = _ptr->next;
-                    delete _ptr;
-                    _ptr = next;
-               }
+               auto* ptr = _head;
                _head = _tail = nullptr;
+
+               while (ptr) {
+                   auto* next = ptr->next;
+                   node_allocator_traits_t::destroy(_node_allocator, ptr);
+                   _node_allocator.deallocate(ptr, 1);
+                   ptr = next;
+               }
           }
 
-          class iterator {
-               public:
-                    using iterator_category = std::bidirectional_iterator_tag;
-                    using difference_type = std::ptrdiff_t;
-                    using value_type = T;
-                    using pointer = value_type *;
-                    using reference = value_type &;
+         
 
-                    iterator() = default;
-                    iterator(dl_node<T> *head) : _ptr(head) {}
-                    reference& operator *() const {return _ptr->data;}
-                    iterator& operator ++() {_ptr = _ptr->next; return *this;}
-                    iterator operator ++(int) {iterator tmp = *this; _ptr = _ptr->next; return tmp;}
-                    iterator& operator --() {_ptr = _ptr->previous; return *this;}
-                    iterator operator --(int) {iterator tmp = *this; _ptr = _ptr->previous; return tmp;}
-                    bool operator ==(const iterator &other) const {return _ptr == other._ptr;}
-                    bool operator !=(const iterator &other) const {return _ptr != other._ptr;}
-
-               private:
-                   dl_node<T> *_ptr = nullptr;
-          };
+          /// @brief Returns an iterator to the beginning of the list.
+          /// @return Iterator to the first element.
           iterator begin() const { return iterator(_head); }
-          iterator end() const { return iterator(nullptr); }
-       
 
-          ~linked_list(){ clear(); }
+          /// @brief Returns an iterator to the end of the list.
+          /// @return Iterator to the element following the last element.
+          iterator end() const { return iterator(nullptr); }
+
+          /// @brief Returns a const iterator to the beginning of the list.
+          /// @return Const iterator to the first element.
+          const_iterator cbegin() const { return const_iterator(_head); }
+
+          /// @brief Returns a const iterator to the end of the list.
+          /// @return Const iterator to the element following the last element.
+          const_iterator cend() const { return const_iterator(nullptr); }
+
+          /// @brief Destructor that clears the contents of the list.
+          ~linked_list(){ 
+               clear();
+          }
 
      private:
           dl_node<T> *_head = nullptr, *_tail = nullptr;
+          allocator_t _allocator;
+          node_allocator_t _node_allocator;
+
+          template <typename NodeType, typename ValueType>
+          class basic_iterator {
+          public:
+               using iterator_category = std::bidirectional_iterator_tag;
+               using difference_type = std::ptrdiff_t;
+               using value_type = ValueType;
+               using pointer = ValueType*;
+               using reference = ValueType&;
+
+               using node_ptr_t = std::add_pointer_t<NodeType>;
+
+               basic_iterator() = default;
+               explicit basic_iterator(node_ptr_t ptr) : _ptr(ptr) {}
+
+               reference operator*() const { return _ptr->data; }
+               pointer operator->() const { return &(_ptr->data); }
+               basic_iterator& operator++() {
+                   _ptr = _ptr->next;
+                   return *this;
+               }
+
+               basic_iterator operator++(int) {
+                   basic_iterator tmp = *this;
+                   ++(*this);
+                   return tmp;
+               }
+
+               basic_iterator& operator--() {
+                   _ptr = _ptr->previous;
+                   return *this;
+               }
+
+               basic_iterator operator--(int) {
+                   basic_iterator tmp = *this;
+                   --(*this);
+                   return tmp;
+               }
+
+               bool operator==(const basic_iterator& other) const { return _ptr == other._ptr; }
+               bool operator!=(const basic_iterator& other) const { return _ptr != other._ptr; }
+
+          private:
+               node_ptr_t _ptr = nullptr;    
+               friend class linked_list;
+          };
+
      };
 }
 #endif
+
+
+
+          // class iterator {
+          //      public:
+          //           using iterator_category = std::bidirectional_iterator_tag;
+          //           using difference_type = std::ptrdiff_t;
+          //           using value_type = T;
+          //           using pointer = value_type *;
+          //           using reference = value_type &;
+
+          //           iterator() = default;
+          //           iterator(dl_node<T> *head) : _ptr(head) {}
+          //           reference& operator *() const {return _ptr->data;}
+          //           iterator& operator ++() {_ptr = _ptr->next; return *this;}
+          //           iterator operator ++(int) {iterator tmp = *this; _ptr = _ptr->next; return tmp;}
+          //           iterator& operator --() {_ptr = _ptr->previous; return *this;}
+          //           iterator operator --(int) {iterator tmp = *this; _ptr = _ptr->previous; return tmp;}
+          //           bool operator ==(const iterator &other) const {return _ptr == other._ptr;}
+          //           bool operator !=(const iterator &other) const {return _ptr != other._ptr;}
+
+          //      private:
+          //          dl_node<T> *_ptr = nullptr;
+          // };

@@ -30,6 +30,17 @@ BOOST_AUTO_TEST_CASE(unordered_list_out_of_bounds_test) {
     BOOST_CHECK_THROW(list[10], std::out_of_range);  // Index beyond the capacity
 }
 
+BOOST_AUTO_TEST_CASE(unordered_list_test_size){
+    ds::unordered_list<int, std::allocator<int>> list(10);
+    BOOST_CHECK_EQUAL(list.size(), 0);
+    list[0] = 10;
+    BOOST_CHECK_EQUAL(list.size(), 1);
+    list[1] = 20;
+    BOOST_CHECK_EQUAL(list.size(), 2);
+    list[2] = 30;
+    BOOST_CHECK_EQUAL(list.size(), 3);
+    std::remove(list.begin(), list.end(), 20);
+}
 // Test reserve functionality and reallocation
 BOOST_AUTO_TEST_CASE(unordered_list_reserve_test) {
     ds::unordered_list<int, std::allocator<int>> list(5);

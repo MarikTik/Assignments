@@ -1,11 +1,12 @@
 #ifndef DL_NODE_HPP
 #define DL_NODE_HPP
+#include <utility>
 
 namespace ds{
      template<typename T>
      struct dl_node{
-          template<typename Arg>
-          dl_node(Arg &&val) : data{std::forward<Arg>(val)}
+          template<typename... Args>
+          dl_node(Args&&... args) : data(std::forward<Args>(args)...)
           {   
           }
           dl_node(dl_node &&other) : previous{other.previous}, next{other.next}, data{std::move(other.data)}
