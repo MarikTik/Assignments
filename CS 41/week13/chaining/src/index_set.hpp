@@ -83,7 +83,6 @@ namespace ds::_utils{
                return std::numeric_limits<size_t>::digits;
           };
 
-
           constexpr static size_t required_words(size_t capacity) {
                return (capacity + index_set::word_bitsize() - 1) / index_set::word_bitsize();
           }

@@ -44,17 +44,18 @@ namespace ds{
           }
          
           T &operator[](size_t index){
-               if (index >= this->_capacity)
+               if (index >= _capacity)
                     throw std::out_of_range("index out of bounds");
 
                if (not _index_set.test(index)){
                     _index_set.set(index);
                     _indexes.push_back(index);
+                    allocator_traits_t::construct(_allocator, &_buffer[index]);
                }
                return _buffer[index];
           }
           const T &operator[](size_t index) const{
-               if (index >= this->_capacity or not _index_set.test(index))
+               if (index >= _capacity or not _index_set.test(index))
                     throw std::out_of_range("invalid index access");
                return _buffer[index];
           }

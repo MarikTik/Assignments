@@ -3,6 +3,7 @@
 #include "dl_node.hpp"
 #include <limits>
 #include <type_traits>
+#include <algorithm>
 
 namespace ds{
      template<
@@ -14,13 +15,8 @@ namespace ds{
           using node_t = dl_node<T>;
           using node_allocator_t = typename std::allocator_traits<Allocator>::template rebind_alloc<node_t>;
           using node_allocator_traits_t = std::allocator_traits<node_allocator_t>;
-
-          template<typename, typename> class basic_iterator;
+ 
      public:
-
-          using iterator = basic_iterator<dl_node<T>, T>;
-          using const_iterator = basic_iterator<const dl_node<T>, const T>;
-
           /// @brief Constructs an empty linked list.
           linked_list() = default;
 
@@ -131,29 +127,7 @@ namespace ds{
                     emplace_back(*it);
                }
           }
-
-          /// @brief Erases an element from the list at the specified iterator.
-          /// @param it The iterator pointing to the element to erase.
-          /// @return Iterator to the next element in the list.
-          iterator erase(iterator it) {
-               if (it == end()) return end();
-
-               dl_node<T>* node = it._ptr;
-               dl_node<T>* next = node->next;
-               dl_node<T>* previous = node->previous;
-
-               if (previous) previous->next = next;
-               else _head = next;
-
-               if (next) next->previous = previous;
-               else _tail = previous;
-
-               node_allocator_traits_t::destroy(_node_allocator, node);
-               _node_allocator.deallocate(node, 1);
-
-               return iterator(next);
-          }    
-
+          
           /// @brief Returns the number of elements in the list.
           /// @note This function has linear complexity.
           /// @return The size of the list.
@@ -182,7 +156,62 @@ namespace ds{
                }
           }
 
-         
+          class iterator {
+          public:
+               using iterator_category = std::bidirectional_iterator_tag;
+               using difference_type = std::ptrdiff_t;
+               using value_type = T;
+               using pointer = T*;
+               using reference = T&;
+
+
+               iterator() = default;
+               explicit iterator( dl_node<T> *ptr) : _ptr(ptr) {}
+               reference operator*() const { return _ptr->data; }
+               pointer operator->() const { return &(_ptr->data); }
+               iterator& operator++() {_ptr = _ptr->next; return *this; }
+               iterator operator++(int) {iterator tmp = *this; ++(*this); return tmp; }
+               iterator& operator--() {_ptr = _ptr->previous; return *this; }
+               iterator operator--(int) {iterator tmp = *this; --(*this); return tmp; }
+               bool operator==(const iterator& other) const { return _ptr == other._ptr; }
+               bool operator!=(const iterator& other) const { return _ptr != other._ptr; }
+
+          private:
+               dl_node<T> *_ptr = nullptr;    
+               friend class linked_list;
+          };
+
+          /// @brief Erases an element from the list at the specified iterator.
+          /// @param it The iterator pointing to the element to erase.
+          /// @return Iterator to the next element in the list.
+          iterator erase(iterator it) {
+               if (it == end()) return end();
+
+               dl_node<T>* node = it._ptr;
+               dl_node<T>* next = node->next;
+               dl_node<T>* previous = node->previous;
+
+               if (previous) previous->next = next;
+               else _head = next;
+
+               if (next) next->previous = previous;
+               else _tail = previous;
+
+               node_allocator_traits_t::destroy(_node_allocator, node);
+               _node_allocator.deallocate(node, 1);
+
+               return iterator(next);
+          }    
+
+          template<typename Predicate>
+          iterator remove_if(Predicate predicate, iterator begin, iterator end){
+               auto it = std::find_if(begin, end, predicate);
+               return erase(it);
+          }    
+          template<typename Predicate>
+          iterator remove_if(Predicate predicate){
+               return remove_if(predicate, begin(), end());
+          }
 
           /// @brief Returns an iterator to the beginning of the list.
           /// @return Iterator to the first element.
@@ -192,13 +221,20 @@ namespace ds{
           /// @return Iterator to the element following the last element.
           iterator end() const { return iterator(nullptr); }
 
-          /// @brief Returns a const iterator to the beginning of the list.
-          /// @return Const iterator to the first element.
-          const_iterator cbegin() const { return const_iterator(_head); }
+          /// @brief Returns a reference to the first element in the list.
+          /// @return T&
+          T& front() const { return _head->data; }
+          
+          /// @brief Returns a const reference to the first element in the list.
+          //const T& front() const { return _head->data; }
 
-          /// @brief Returns a const iterator to the end of the list.
-          /// @return Const iterator to the element following the last element.
-          const_iterator cend() const { return const_iterator(nullptr); }
+          /// @brief Returns a reference to the last element in the list.
+          /// @return 
+          T& back() const { return _tail->data; }
+
+          /// @brief Returns a const reference to the last element in the list.
+          /// @return
+          //const T& back() const { return _tail->data; }
 
           /// @brief Destructor that clears the contents of the list.
           ~linked_list(){ 
@@ -209,34 +245,6 @@ namespace ds{
           dl_node<T> *_head = nullptr, *_tail = nullptr;
           allocator_t _allocator;
           node_allocator_t _node_allocator;
-
-          template <typename NodeType, typename ValueType>
-          class basic_iterator {
-          public:
-               using iterator_category = std::bidirectional_iterator_tag;
-               using difference_type = std::ptrdiff_t;
-               using value_type = ValueType;
-               using pointer = ValueType*;
-               using reference = ValueType&;
-
-               using node_ptr_t = std::add_pointer_t<NodeType>;
-
-               basic_iterator() = default;
-               explicit basic_iterator(node_ptr_t ptr) : _ptr(ptr) {}
-               reference operator*() const { return _ptr->data; }
-               pointer operator->() const { return &(_ptr->data); }
-               basic_iterator& operator++() {_ptr = _ptr->next; return *this; }
-               basic_iterator operator++(int) {basic_iterator tmp = *this; ++(*this); return tmp; }
-               basic_iterator& operator--() {_ptr = _ptr->previous; return *this; }
-               basic_iterator operator--(int) {basic_iterator tmp = *this; --(*this); return tmp; }
-               bool operator==(const basic_iterator& other) const { return _ptr == other._ptr; }
-               bool operator!=(const basic_iterator& other) const { return _ptr != other._ptr; }
-
-          private:
-               node_ptr_t _ptr = nullptr;    
-               friend class linked_list;
-          };
-
      };
 }
 #endif

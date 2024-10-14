@@ -349,7 +349,7 @@ BOOST_AUTO_TEST_CASE(unordered_list_shrink_to_fit_reduction_test) {
     BOOST_CHECK_EQUAL(list[5], 300);
 }
 
- 
+
 // Test shrink_to_fit with an empty list
 BOOST_AUTO_TEST_CASE(unordered_list_shrink_to_fit_empty_list_test) {
     ds::unordered_list<int, std::allocator<int>> list(10);

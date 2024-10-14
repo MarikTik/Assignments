@@ -103,19 +103,7 @@ BOOST_AUTO_TEST_CASE(test_insert_range) {
     BOOST_CHECK_EQUAL(*(++it), 2);
     BOOST_CHECK_EQUAL(*(++it), 3);
 }
-
-BOOST_AUTO_TEST_CASE(test_const_iterator) {
-    ds::linked_list<int> list;
-    list.push_back(1);
-    list.push_back(2);
-
-    const auto& const_list = list;
-    auto it = const_list.cbegin();
-    BOOST_CHECK_EQUAL(*it, 1);
-    BOOST_CHECK_EQUAL(*(++it), 2);
-    BOOST_CHECK(++it == const_list.cend());
-}
-
+ 
 BOOST_AUTO_TEST_CASE(test_clear) {
     ds::linked_list<int> list;
     list.push_front(1);
