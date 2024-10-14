@@ -15,8 +15,7 @@ namespace ds{
           using node_allocator_t = typename std::allocator_traits<Allocator>::template rebind_alloc<node_t>;
           using node_allocator_traits_t = std::allocator_traits<node_allocator_t>;
 
-          template<typename Node, typename Value>
-          class basic_iterator;
+          template<typename, typename> class basic_iterator;
      public:
 
           using iterator = basic_iterator<dl_node<T>, T>;
@@ -64,7 +63,6 @@ namespace ds{
           /// @return Reference to the current object.
           linked_list &operator = (linked_list &&other) noexcept{
                if (this != &other) {
-                    clear();
                     std::swap(_head, other._head);
                     std::swap(_tail, other._tail);
                     std::swap(_allocator, other._allocator);
@@ -124,11 +122,11 @@ namespace ds{
           }
 
           /// @brief Inserts a range of elements into the list.
-          /// @tparam InputIterator The type of the input iterator.
+          /// @tparam InputIt The type of the input iterator.
           /// @param begin Iterator to the beginning of the range.
           /// @param end Iterator to the end of the range.
-          template<typename InputIterator>
-          void insert_range(InputIterator begin, InputIterator end){
+          template<typename InputIt>
+          void insert_range(InputIt begin, InputIt end){
                for (auto it = begin; it != end; ++it){
                     emplace_back(*it);
                }
@@ -154,10 +152,10 @@ namespace ds{
                _node_allocator.deallocate(node, 1);
 
                return iterator(next);
-               
           }    
 
           /// @brief Returns the number of elements in the list.
+          /// @note This function has linear complexity.
           /// @return The size of the list.
           size_t size() const {
                size_t count = 0;
@@ -166,7 +164,7 @@ namespace ds{
           }
 
           /// @brief Checks if the list is empty.
-          /// @return True if the list is empty, false otherwise.
+          /// @return True if the list is empty, false otherwise. 
           bool empty() const{
                return not _head;
           }
@@ -225,31 +223,12 @@ namespace ds{
 
                basic_iterator() = default;
                explicit basic_iterator(node_ptr_t ptr) : _ptr(ptr) {}
-
                reference operator*() const { return _ptr->data; }
                pointer operator->() const { return &(_ptr->data); }
-               basic_iterator& operator++() {
-                   _ptr = _ptr->next;
-                   return *this;
-               }
-
-               basic_iterator operator++(int) {
-                   basic_iterator tmp = *this;
-                   ++(*this);
-                   return tmp;
-               }
-
-               basic_iterator& operator--() {
-                   _ptr = _ptr->previous;
-                   return *this;
-               }
-
-               basic_iterator operator--(int) {
-                   basic_iterator tmp = *this;
-                   --(*this);
-                   return tmp;
-               }
-
+               basic_iterator& operator++() {_ptr = _ptr->next; return *this; }
+               basic_iterator operator++(int) {basic_iterator tmp = *this; ++(*this); return tmp; }
+               basic_iterator& operator--() {_ptr = _ptr->previous; return *this; }
+               basic_iterator operator--(int) {basic_iterator tmp = *this; --(*this); return tmp; }
                bool operator==(const basic_iterator& other) const { return _ptr == other._ptr; }
                bool operator!=(const basic_iterator& other) const { return _ptr != other._ptr; }
 
@@ -261,27 +240,3 @@ namespace ds{
      };
 }
 #endif
-
-
-
-          // class iterator {
-          //      public:
-          //           using iterator_category = std::bidirectional_iterator_tag;
-          //           using difference_type = std::ptrdiff_t;
-          //           using value_type = T;
-          //           using pointer = value_type *;
-          //           using reference = value_type &;
-
-          //           iterator() = default;
-          //           iterator(dl_node<T> *head) : _ptr(head) {}
-          //           reference& operator *() const {return _ptr->data;}
-          //           iterator& operator ++() {_ptr = _ptr->next; return *this;}
-          //           iterator operator ++(int) {iterator tmp = *this; _ptr = _ptr->next; return tmp;}
-          //           iterator& operator --() {_ptr = _ptr->previous; return *this;}
-          //           iterator operator --(int) {iterator tmp = *this; _ptr = _ptr->previous; return tmp;}
-          //           bool operator ==(const iterator &other) const {return _ptr == other._ptr;}
-          //           bool operator !=(const iterator &other) const {return _ptr != other._ptr;}
-
-          //      private:
-          //          dl_node<T> *_ptr = nullptr;
-          // };

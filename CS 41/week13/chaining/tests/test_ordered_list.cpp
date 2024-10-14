@@ -1,6 +1,5 @@
 #include <boost/test/unit_test.hpp>
 #include "ordered_list.hpp"
-
 #include <boost/test/unit_test.hpp>
 #include "ordered_list.hpp"
 
@@ -23,32 +22,37 @@ BOOST_AUTO_TEST_CASE(ordered_list_push_back_test) {
     BOOST_CHECK_EQUAL(*it, 3);
 }
 
-// Test remove by predicate functionality using iterators
-// BOOST_AUTO_TEST_CASE(ordered_list_remove_test) {
-//     ds::ordered_list<int> list(4);
+    //Test remove by predicate functionality using iterators
+BOOST_AUTO_TEST_CASE(ordered_list_remove_test) {
+    ds::ordered_list<int> list(4);
 
-//     // Add elements
-//     list.push_back(1);
-//     list.push_back(2);
-//     list.push_back(3);
-//     list.push_back(4);
+    // Add elements
+    list.push_back(1);
+    list.push_back(2);
+    list.push_back(3);
+    list.push_back(4);
 
-//     // Remove first even number
-//     list.remove([](int x) noexcept { return x % 2 == 0; });
+    // Remove first even number
     
-//     auto it = list.begin();
-//     BOOST_CHECK_EQUAL(*it, 1);
-//     ++it;
-//     BOOST_CHECK_EQUAL(*it, 3);
-//     ++it;
-//     BOOST_CHECK_EQUAL(*it, 4);
+    list.remove(std::find_if(list.begin(), list.end(), [](int x) { return x % 2 == 0; }));
+ 
+    auto it = list.begin();
+    BOOST_CHECK_EQUAL(*it, 1);
+    ++it;
+    BOOST_CHECK_EQUAL(*it, 3);
+    ++it;
+    BOOST_CHECK_EQUAL(*it, 4);
 
-//     // Remove all odd numbers
-//     list.remove([](int x) noexcept { return x % 2 != 0; }, 0);
+    // Remove first odd number
+    list.remove(std::find_if(list.begin(), list.end(), [](int x) { return x % 2 != 0; }));
 
-//     it = list.begin();
-//     BOOST_CHECK_EQUAL(*it, 4);
-// }
+    it = list.begin();
+    BOOST_CHECK_EQUAL(*it, 3);
+    ++it; 
+    BOOST_CHECK_EQUAL(*it, 4);
+    ++it;
+    BOOST_CHECK(it == list.end());
+}
 
 // Test iterator increment and decrement
 BOOST_AUTO_TEST_CASE(iterator_increment_decrement_test) {

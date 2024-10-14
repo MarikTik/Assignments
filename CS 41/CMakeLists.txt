@@ -3,7 +3,8 @@ project(proj_tester)
 
 add_subdirectory(week13/chaining)
 
-add_compile_options(
+add_executable(${PROJECT_NAME} test.cpp)
+target_compile_options(${PROJECT_NAME} PRIVATE 
     -Wall
     -Wextra
     -Wpedantic
@@ -41,16 +42,10 @@ add_compile_options(
     -Wstrict-aliasing
     -Wwrite-strings
     -Wunsafe-loop-optimizations
-    -Wunsuffixed-float-constants
     -Wvariadic-macros
     -Wvla
-    -Wweak-vtables
     -Wmissing-declarations
-    -Wmissing-prototypes
     -Wreturn-type
     -Wmissing-format-attribute
     -Wlarger-than=8192
-    -Wpadded
 )
-
-

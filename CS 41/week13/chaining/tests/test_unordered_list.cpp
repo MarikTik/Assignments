@@ -312,4 +312,52 @@ BOOST_AUTO_TEST_CASE(unordered_list_modify_via_range_based_for_loop_test) {
     BOOST_CHECK_EQUAL(list[7], 300);
 }
 
+// Test shrink_to_fit functionality
+BOOST_AUTO_TEST_CASE(unordered_list_shrink_to_fit_test) {
+    ds::unordered_list<int, std::allocator<int>> list(10);
+
+    list[2] = 5;
+    list[7] = 10;
+    list[9] = 15;
+
+    BOOST_CHECK_EQUAL(list.capacity(), 10);  // Initial capacity
+
+    list.shrink_to_fit();  // Adjust capacity
+
+    BOOST_CHECK_EQUAL(list.capacity(), 10);  // Capacity remains the same
+    BOOST_CHECK_EQUAL(list.size(), 3);       // Size unchanged
+    BOOST_CHECK_EQUAL(list[2], 5);
+    BOOST_CHECK_EQUAL(list[7], 10);
+    BOOST_CHECK_EQUAL(list[9], 15);
+}
+
+// Test shrink_to_fit with reduction in capacity
+BOOST_AUTO_TEST_CASE(unordered_list_shrink_to_fit_reduction_test) {
+    ds::unordered_list<int, std::allocator<int>> list(15);
+
+    list[1] = 100;
+    list[3] = 200;
+    list[5] = 300;
+
+    BOOST_CHECK_EQUAL(list.capacity(), 15);  // Initial capacity
+
+    list.shrink_to_fit();  // Should reduce capacity
+
+    BOOST_CHECK_EQUAL(list.capacity(), 6);  // Last index (5) + 1
+    BOOST_CHECK_EQUAL(list[1], 100);
+    BOOST_CHECK_EQUAL(list[3], 200);
+    BOOST_CHECK_EQUAL(list[5], 300);
+}
+
+ 
+// Test shrink_to_fit with an empty list
+BOOST_AUTO_TEST_CASE(unordered_list_shrink_to_fit_empty_list_test) {
+    ds::unordered_list<int, std::allocator<int>> list(10);
+
+    BOOST_CHECK_EQUAL(list.capacity(), 10);  // Initial capacity
+    list.shrink_to_fit();
+    BOOST_CHECK_EQUAL(list.capacity(), 10);  // Capacity shouldn't change if there are no elements
+}
+
+ 
 BOOST_AUTO_TEST_SUITE_END()

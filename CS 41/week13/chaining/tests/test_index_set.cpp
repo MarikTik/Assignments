@@ -111,14 +111,14 @@ BOOST_AUTO_TEST_CASE(test_index_set_size) {
     set.set(15);
     set.set(25);
 
-    BOOST_CHECK_EQUAL(set.size(), 3);
+    BOOST_CHECK_EQUAL(set.count(), 3);
 
     set.reset(15);
-    BOOST_CHECK_EQUAL(set.size(), 2);
+    BOOST_CHECK_EQUAL(set.count(), 2);
 
     set.reset(5);
     set.reset(25);
-    BOOST_CHECK_EQUAL(set.size(), 0);
+    BOOST_CHECK_EQUAL(set.count(), 0);
 }
 
 BOOST_AUTO_TEST_SUITE_END()
