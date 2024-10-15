@@ -54,12 +54,23 @@ namespace ds{
                }
                return _buffer[index];
           }
-          const T &operator[](size_t index) const{
+          // const T &operator[](size_t index) const{
+          //      if (index >= _capacity or not _index_set.test(index))
+          //           throw std::out_of_range("invalid index access");
+          //      return _buffer[index];
+          // }
+
+          T &at(size_t index){
                if (index >= _capacity or not _index_set.test(index))
                     throw std::out_of_range("invalid index access");
                return _buffer[index];
           }
 
+          const T &at(size_t index) const{
+               if (index >= _capacity or not _index_set.test(index))
+                    throw std::out_of_range("invalid index access");
+               return _buffer[index];
+          }
           void reserve(size_t new_capacity){
                if (new_capacity <= _capacity) return;
                T* new_buffer = allocator_traits_t::allocate(_allocator, new_capacity);
