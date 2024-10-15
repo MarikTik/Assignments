@@ -29,6 +29,28 @@ namespace ds{
                {
                }
 
+               /// @brief Copy constructor.
+               /// @param other The list to copy from.
+               ordered_list(const ordered_list &other)
+                    : _buffer(allocator_traits_t::allocate(_allocator, other._capacity)),
+                      _capacity(other._capacity),
+                      _size(other._size)
+               {
+                    std::uninitialized_copy(other._buffer, other._buffer + other._size, _buffer);
+               }
+
+               /// @brief Copy assignment operator.
+               /// @param other The list to copy from.
+               /// @return Reference to this list.
+               ordered_list &operator =(const ordered_list &other){
+                    if (this != &other) {
+                         clear();
+                         if (_capacity < other._size) reserve(other._size);
+                         std::uninitialized_copy(other._buffer, other._buffer + other._size, _buffer);
+                         _size = other._size;
+                    }
+                    return *this;
+               }
                /// @brief Move constructor.
                /// @param other The list to move from.
                ordered_list(ordered_list &&other) noexcept
@@ -112,16 +134,16 @@ namespace ds{
                     return not _size;
                }
                /// @brief Returns an iterator to the beginning of the list.
-               iterator begin() {return iterator(this->_buffer);}
+               iterator begin() {return iterator(_buffer);}
 
                /// @brief Returns an iterator to the end of the list.
-               iterator end() {return iterator(this->_buffer + this->_size);}
+               iterator end() {return iterator(_buffer + _size);}
 
                /// @brief Returns a const iterator to the beginning of the list.
-               const_iterator begin() const {return const_iterator(this->_buffer);}
+               const_iterator cbegin() const {return const_iterator(_buffer);}
 
                /// @brief Returns a const iterator to the end of the list.
-               const_iterator end() const {return const_iterator(this->_buffer + this->_size);}
+               const_iterator cend() const {return const_iterator(_buffer + _size);}
 
                /// @brief Destructor to release allocated memory.
                ~ordered_list() { clear(); }
@@ -131,7 +153,7 @@ namespace ds{
                allocator_t _allocator;
 
                static constexpr size_t _default_capacity = 8;
-
+               
                void reallocate(size_t new_capacity) {
                     T* new_buffer = allocator_traits_t::allocate(_allocator, new_capacity);
                     std::uninitialized_move(_buffer, _buffer + _size, new_buffer);

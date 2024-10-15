@@ -15,8 +15,12 @@ namespace ds{
           using node_t = dl_node<T>;
           using node_allocator_t = typename std::allocator_traits<Allocator>::template rebind_alloc<node_t>;
           using node_allocator_traits_t = std::allocator_traits<node_allocator_t>;
- 
+
+          template<typename> class basic_iterator;
      public:
+
+          using iterator = basic_iterator<T>;
+          using const_iterator = basic_iterator<const T>;
           /// @brief Constructs an empty linked list.
           linked_list() = default;
 
@@ -26,8 +30,7 @@ namespace ds{
                : _allocator(other._allocator),
                  _node_allocator(other._node_allocator)
           {
-               clear();
-               insert_range(other.begin(), other.end());
+               insert_back(other.begin(), other.end());
           }
 
           /// @brief Assigns the contents of another linked list to this one.
@@ -39,7 +42,7 @@ namespace ds{
                     clear();
                     _allocator = other._allocator;
                     _node_allocator = other._node_allocator;
-                    insert_range(other.begin(), other.end());
+                    insert_back(other.begin(), other.end());
                }
                return *this;
           }
@@ -117,15 +120,24 @@ namespace ds{
                emplace_front(std::forward<Arg>(value));
           }
 
-          /// @brief Inserts a range of elements into the list.
+          /// @brief Inserts a range of elements into the back of the list.
           /// @tparam InputIt The type of the input iterator.
           /// @param begin Iterator to the beginning of the range.
           /// @param end Iterator to the end of the range.
           template<typename InputIt>
-          void insert_range(InputIt begin, InputIt end){
-               for (auto it = begin; it != end; ++it){
-                    emplace_back(*it);
-               }
+          void insert_front(InputIt begin, InputIt end){
+               for (auto it = begin; it != end; ++it)
+                    push_back(*it);
+          }
+
+          /// @brief Inserts a range of elements into the front of the list.
+          /// @tparam InputIt The type of the input iterator.
+          /// @param begin Iterator to the beginning of the range.
+          /// @param end Iterator to the end of the range.
+          template<typename InputIt>
+          void insert_back(InputIt begin, InputIt end){
+               for (auto it = begin; it != end; ++it)
+                    push_front(*it);
           }
           
           /// @brief Returns the number of elements in the list.
@@ -156,32 +168,7 @@ namespace ds{
                }
           }
 
-          class iterator {
-          public:
-               using iterator_category = std::bidirectional_iterator_tag;
-               using difference_type = std::ptrdiff_t;
-               using value_type = T;
-               using pointer = T*;
-               using reference = T&;
-
-
-               iterator() = default;
-               explicit iterator( dl_node<T> *ptr) : _ptr(ptr) {}
-               reference operator*() const { return _ptr->data; }
-               pointer operator->() const { return &(_ptr->data); }
-               iterator& operator++() {_ptr = _ptr->next; return *this; }
-               iterator operator++(int) {iterator tmp = *this; ++(*this); return tmp; }
-               iterator& operator--() {_ptr = _ptr->previous; return *this; }
-               iterator operator--(int) {iterator tmp = *this; --(*this); return tmp; }
-               bool operator==(const iterator& other) const { return _ptr == other._ptr; }
-               bool operator!=(const iterator& other) const { return _ptr != other._ptr; }
-
-          private:
-               dl_node<T> *_ptr = nullptr;    
-               friend class linked_list;
-          };
-
-          /// @brief Erases an element from the list at the specified iterator.
+          /// @brief Erases an element from the list by the specified iterator.
           /// @param it The iterator pointing to the element to erase.
           /// @return Iterator to the next element in the list.
           iterator erase(iterator it) {
@@ -203,23 +190,46 @@ namespace ds{
                return iterator(next);
           }    
 
+          /// @brief Removes elements from the specified range that satisfy a predicate.
+          /// @tparam Predicate the type of the predicate function.
+          /// @param predicate the predicate function.
+          /// @param begin the iterator to the beginning of the range.
+          /// @param end the iterator to the end of the range.
+          /// @return iterator to the next element after the last removed element.
           template<typename Predicate>
           iterator remove_if(Predicate predicate, iterator begin, iterator end){
                auto it = std::find_if(begin, end, predicate);
                return erase(it);
           }    
+
+          /// @brief Removes elementsfrom the list that satisfy a predicate.
+          /// @tparam Predicate the type of the predicate function.
+          /// @param predicate the predicate function.
+          /// @return the iterator to the next element after the last removed element.
           template<typename Predicate>
           iterator remove_if(Predicate predicate){
                return remove_if(predicate, begin(), end());
           }
 
           /// @brief Returns an iterator to the beginning of the list.
-          /// @return Iterator to the first element.
-          iterator begin() const { return iterator(_head); }
+          iterator begin() { return iterator(_head); }
 
           /// @brief Returns an iterator to the end of the list.
-          /// @return Iterator to the element following the last element.
-          iterator end() const { return iterator(nullptr); }
+          iterator end() { return iterator(nullptr); }
+
+          /// @brief Returns a const iterator to the beginning of the list.
+          const_iterator cbegin() const { return const_iterator(_head); }
+
+          /// @brief Returns a const iterator to the end of the list. 
+          const_iterator cend() const { return const_iterator(nullptr); }
+
+          /// @brief Returns a const iterator to the beginning of the list.
+          /// @note This function is provided for compatibility with the standard library. Use cbegin() instead.
+          const_iterator begin() const { return const_iterator(_head); }
+
+          /// @brief Returns a const iterator to the end of the list.
+          /// @note This function is provided for compatibility with the standard library. Use cend() instead.
+          const_iterator end() const { return const_iterator(nullptr); }
 
           /// @brief Returns a reference to the first element in the list.
           /// @return T&
@@ -245,6 +255,32 @@ namespace ds{
           dl_node<T> *_head = nullptr, *_tail = nullptr;
           allocator_t _allocator;
           node_allocator_t _node_allocator;
+
+          template<typename U>
+          class basic_iterator {
+          public:
+               using iterator_category = std::bidirectional_iterator_tag;
+               using difference_type = std::ptrdiff_t;
+               using value_type = U;
+               using pointer = value_type*;
+               using reference = value_type&;
+
+
+               basic_iterator() = default;
+               explicit basic_iterator( dl_node<T> *ptr) : _ptr(ptr) {}
+               reference operator*() const { return _ptr->data; }
+               pointer operator->() const { return &(_ptr->data); }
+               basic_iterator& operator++() {_ptr = _ptr->next; return *this; }
+               basic_iterator operator++(int) {basic_iterator tmp = *this; ++(*this); return tmp; }
+               basic_iterator& operator--() {_ptr = _ptr->previous; return *this; }
+               basic_iterator operator--(int) {basic_iterator tmp = *this; --(*this); return tmp; }
+               bool operator==(const basic_iterator& other) const { return _ptr == other._ptr; }
+               bool operator!=(const basic_iterator& other) const { return _ptr != other._ptr; }
+
+          private:
+               dl_node<T> *_ptr = nullptr;    
+               friend class linked_list;
+          };
      };
 }
 #endif

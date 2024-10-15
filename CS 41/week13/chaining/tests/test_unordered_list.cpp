@@ -359,5 +359,96 @@ BOOST_AUTO_TEST_CASE(unordered_list_shrink_to_fit_empty_list_test) {
     BOOST_CHECK_EQUAL(list.capacity(), 10);  // Capacity shouldn't change if there are no elements
 }
 
- 
+BOOST_AUTO_TEST_CASE(unordered_list_const_iterator_basic_test) {
+    ds::unordered_list<int, std::allocator<int>> list(10);
+
+    list[1] = 10;
+    list[3] = 20;
+    list[5] = 30;
+
+    const auto& const_list = list;
+    auto it = const_list.cbegin();
+    
+    BOOST_CHECK_EQUAL(*it, 10);
+    ++it;
+    BOOST_CHECK_EQUAL(*it, 20);
+    ++it;
+    BOOST_CHECK_EQUAL(*it, 30);
+}
+
+//Test const_iterator comparison (equality and inequality)
+BOOST_AUTO_TEST_CASE(unordered_list_const_iterator_comparison_test) {
+    ds::unordered_list<int, std::allocator<int>> list(10);
+    
+    list[1] = 100;
+    list[2] = 200;
+
+    const auto& const_list = list;
+    auto it1 = const_list.cbegin();
+    auto it2 = const_list.cbegin();
+    auto it3 = const_list.cend();
+
+    BOOST_CHECK(it1 == it2);  // Check equality
+    ++it2;
+    BOOST_CHECK(it1 != it2);  // Check inequality
+    BOOST_CHECK(it2 != it3);  // Ensure not at the end yet
+}
+
+//Test const_iterator in range-based for loop
+BOOST_AUTO_TEST_CASE(unordered_list_const_iterator_range_based_for_loop_test) {
+    ds::unordered_list<int, std::allocator<int>> list(10);
+
+    list[1] = 5;
+    list[2] = 10;
+    list[4] = 15;
+
+    const auto& const_list = list;
+    std::vector<int> values;
+
+    for (const auto& value : const_list) {
+        values.push_back(value);  // Collect values
+    }
+
+    BOOST_CHECK_EQUAL(values.size(), 3);
+    BOOST_CHECK_EQUAL(values[0], 5);
+    BOOST_CHECK_EQUAL(values[1], 10);
+    BOOST_CHECK_EQUAL(values[2], 15);
+}
+
+// Test const_iterator with std::find
+BOOST_AUTO_TEST_CASE(unordered_list_const_iterator_std_find_test) {
+    ds::unordered_list<int, std::allocator<int>> list(10);
+
+    list[0] = 100;
+    list[2] = 200;
+    list[4] = 300;
+
+    const auto& const_list = list;
+
+    auto it = std::find(const_list.begin(), const_list.end(), 200);
+    BOOST_CHECK(it != const_list.end());  // Found element
+    BOOST_CHECK_EQUAL(*it, 200);
+
+    it = std::find(const_list.begin(), const_list.end(), 500);
+    BOOST_CHECK(it == const_list.end());  // Element not found
+}
+
+// Test const_iterator boundary conditions
+BOOST_AUTO_TEST_CASE(unordered_list_const_iterator_boundary_test) {
+    ds::unordered_list<int, std::allocator<int>> list(10);
+
+    list[0] = 1;
+    list[5] = 2;
+    list[9] = 3;
+
+    const auto& const_list = list;
+    auto it = const_list.begin();
+
+    BOOST_CHECK(it != const_list.end());  // Ensure begin != end
+    ++it;
+    ++it;
+    ++it;
+    BOOST_CHECK(it == const_list.end());  // Check if reached end
+}
+
 BOOST_AUTO_TEST_SUITE_END()

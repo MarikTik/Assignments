@@ -3,16 +3,31 @@
 #include <cstddef>
 #include <limits>
 #include "zero_init_allocator.hpp"
+// I didn't want to make this class dependant on a template<typename Block, typename Allocator> 
+// as the boost version of dynamic_bitset does, for simplicity I just used a size_t array
 
 namespace ds::_utils{
-     
-
      class index_set{
      public:
           index_set(size_t capacity = 4) 
                : _buffer(new size_t[capacity]()), 
                  _capacity(capacity)
           {
+          }
+          index_set(const index_set &other)
+               : _buffer(new size_t[other._capacity]()),
+                 _capacity(other._capacity)
+          {
+               std::copy(other._buffer, other._buffer + other._capacity, _buffer);
+          }
+          index_set &operator=(const index_set &other){
+               if (this != &other) {
+                    delete[] _buffer;
+                    _buffer = new size_t[other._capacity]();
+                    _capacity = other._capacity;
+                    std::copy(other._buffer, other._buffer + other._capacity, _buffer);
+               }
+               return *this;
           }
           index_set(index_set &&other) noexcept
                : _buffer(other._buffer),
@@ -22,12 +37,13 @@ namespace ds::_utils{
                other._capacity = 0;
           }
           index_set &operator=(index_set &&other) noexcept{
-               if (this == &other) return *this;
-               delete[] _buffer;
-               _buffer = other._buffer;
-               _capacity = other._capacity;
-               other._buffer = nullptr;
-               other._capacity = 0;
+               if (this != &other){
+                    delete[] _buffer;
+                    _buffer = other._buffer;
+                    _capacity = other._capacity;
+                    other._buffer = nullptr;
+                    other._capacity = 0;
+               };
                return *this;
           }
           void set(size_t index){

@@ -156,4 +156,103 @@ BOOST_AUTO_TEST_CASE(iterator_remove_test) {
     BOOST_CHECK(it == list.end());  // List should now have only two elements
 }
 
+// Test cbegin() and cend() const_iterator functionality
+BOOST_AUTO_TEST_CASE(const_iterator_basic_test) {
+    const ds::ordered_list<int> list = [] {
+        ds::ordered_list<int> temp(5);
+        temp.push_back(10);
+        temp.push_back(20);
+        temp.push_back(30);
+        return temp;
+    }();
+
+    auto it = list.cbegin();
+    BOOST_CHECK_EQUAL(*it, 10);
+    ++it;
+    BOOST_CHECK_EQUAL(*it, 20);
+    ++it;
+    BOOST_CHECK_EQUAL(*it, 30);
+    ++it;
+    BOOST_CHECK(it == list.cend());  // Confirm end of iteration
+}
+
+// Test that const_iterator cannot modify elements
+BOOST_AUTO_TEST_CASE(const_iterator_immutability_test) {
+    const ds::ordered_list<int> list = [] {
+        ds::ordered_list<int> temp(5);
+        temp.push_back(5);
+        temp.push_back(10);
+        temp.push_back(15);
+        return temp;
+    }();
+
+    auto it = list.cbegin();
+    BOOST_CHECK_EQUAL(*it, 5);
+
+    // Ensure const_iterator cannot modify elements (uncommenting below line should cause compilation error)
+    // *it = 20;
+}
+
+// Test comparison of const_iterator with iterator
+BOOST_AUTO_TEST_CASE(const_iterator_comparison_test) {
+    const ds::ordered_list<int> list = [] {
+        ds::ordered_list<int> temp(3);
+        temp.push_back(1);
+        temp.push_back(2);
+        temp.push_back(3);
+        return temp;
+    }();
+
+    auto it = list.cbegin();
+    auto it_end = list.cend();
+
+    BOOST_CHECK(it != it_end);  // Ensure cbegin() is not equal to cend()
+    ++it;
+    BOOST_CHECK(it != it_end);  // Ensure we haven't reached the end
+    ++it;
+    ++it;
+    BOOST_CHECK(it == it_end);  // Now it should point to cend()
+}
+
+// Test range-based for loop with const_iterator
+BOOST_AUTO_TEST_CASE(const_iterator_range_based_for_test) {
+    ds::ordered_list<int> list(5);
+    list.push_back(1);
+    list.push_back(2);
+    list.push_back(3);
+    list.push_back(4);
+    list.push_back(5);
+    
+
+    std::vector<int> values;
+    for (const auto& value : list) {
+        values.push_back(value);
+    }
+
+    BOOST_CHECK_EQUAL(values.size(), 5);
+    BOOST_CHECK_EQUAL(values[0], 1);
+    BOOST_CHECK_EQUAL(values[1], 2);
+    BOOST_CHECK_EQUAL(values[2], 3);
+    BOOST_CHECK_EQUAL(values[3], 4);
+    BOOST_CHECK_EQUAL(values[4], 5);
+}
+
+// Test using std::find with const_iterator
+BOOST_AUTO_TEST_CASE(const_iterator_std_find_test) {
+    const ds::ordered_list<int> list = [] {
+        ds::ordered_list<int> temp(5);
+        temp.push_back(10);
+        temp.push_back(20);
+        temp.push_back(30);
+        return temp;
+    }();
+
+    auto it = std::find(list.cbegin(), list.cend(), 20);
+    BOOST_CHECK(it != list.cend());
+    BOOST_CHECK_EQUAL(*it, 20);
+
+    it = std::find(list.cbegin(), list.cend(), 40);  // Element not in list
+    BOOST_CHECK(it == list.cend());
+}
+
 BOOST_AUTO_TEST_SUITE_END()
