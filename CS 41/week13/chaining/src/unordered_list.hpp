@@ -5,7 +5,9 @@
 #include <type_traits>
 
 namespace ds{
-   
+     /// @brief Represents an unordered dynamic array structure accessible for modification via indexing
+     /// @tparam T The type of the elements to store in the list
+     /// @tparam Allocator The type of the allocator to use for memory management
      template<
           typename T,
           typename Allocator
@@ -139,7 +141,7 @@ namespace ds{
           /// @brief Checks if the specified index is in the list
           /// @param index The index to check
           /// @return Whether the index is in the list
-          bool contains_index(size_t index) const{
+          bool is_used_at(size_t index) const{
                return _index_set.test(index);
           }
 

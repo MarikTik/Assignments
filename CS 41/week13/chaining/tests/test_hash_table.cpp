@@ -204,6 +204,7 @@ BOOST_AUTO_TEST_CASE(hash_table_iterator_test) {
 // Test insertion and size/capacity
 BOOST_AUTO_TEST_CASE(test_hash_table_insert_and_size) {
     ds::hash_table<int, int> table;
+
     BOOST_CHECK(table.empty());
     BOOST_CHECK_EQUAL(table.size(), 0);
 
