@@ -1,0 +1,20 @@
+#!/bin/bash
+
+base_dir=$1  # The base directory where to start looking for packages, e.g., "week2"
+         # The main class name in that .java file, e.g., "Program"
+
+shift 1
+
+build_dir="./build"
+lib_dir="./lib"
+source_files="""$base_dir""/src/*".java" ""$base_dir""/lib/*".java""
+lib_files="$lib_dir/*.jar"
+
+
+compile_options="-Xlint:-deprecation"
+
+# Compile
+javac "$compile_options" -d "$build_dir" -cp "./lib/draw.jar:." ""$source_files"" 
+
+# Run the Java program
+java -cp ""$build_dir":."$lib_files"" "$@"

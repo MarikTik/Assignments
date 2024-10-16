@@ -1,5 +1,5 @@
 import java.awt.Font;
-import java.awt.Point;
+
 public class Program {
     private static final int width = 400, height = 400;
     public static double sine_wave(double x, double amplitude, double period, double xShift, double verticalShift){
