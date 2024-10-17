@@ -21,11 +21,11 @@ class expression_token{
           token_t type() const{
                return _type;
           }
-          template<typename T>
-          void set(T && value){
-               if (constexpr )
-               _variants.emplace<T>(std::forward<T>(value));
-          }
+          // template<typename T>
+          // void set(T && value){
+          //      if (constexpr )
+          //      _variants.emplace<T>(std::forward<T>(value));
+          // }
 
      private:
           token_variant_t _variants;
