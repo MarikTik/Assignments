@@ -1,9 +1,8 @@
 cmake_minimum_required(VERSION 3.22.1)
 project(proj_tester)
 
-# add_subdirectory(week13/chaining)
-
- add_executable(${PROJECT_NAME} test.cpp)
+add_subdirectory(week15/project4)
+# add_executable(${PROJECT_NAME} week13/chaining/ChainingMarkTikhonov.cpp)
 # target_compile_options(${PROJECT_NAME} PRIVATE 
 #     -Wall
 #     -Wextra

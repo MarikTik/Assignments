@@ -3,6 +3,7 @@
 #include "ordered_list.hpp"
 #include "index_set.hpp"
 #include <type_traits>
+#include <memory>
 
 namespace ds{
      /// @brief Represents an unordered dynamic array structure accessible for modification via indexing

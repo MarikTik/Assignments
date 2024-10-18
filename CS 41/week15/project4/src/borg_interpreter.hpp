@@ -4,7 +4,7 @@
 #include <sstream>
 #include "collections/hash_table.hpp"
 
-hash_table<std::string, std::function<void(std::istream)>> translation_table{5};
+ds::hash_table<std::string, std::function<void(std::istream)>> translation_table{5};
 
 class borg_interpreter{
      

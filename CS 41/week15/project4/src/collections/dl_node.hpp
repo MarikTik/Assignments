@@ -10,9 +10,18 @@ namespace ds{
           {   
           }
           dl_node(dl_node &&other) noexcept
-               : previous{other.previous}, next{other.next}, data{std::move(other.data)}
+               : previous(other.previous), next(other.next), data(std::move(other.data))
           {
                other.previous = other.next = nullptr;
+          }
+          dl_node &operator=(dl_node &&other) noexcept{
+               if (this != &other){
+                    previous = other.previous;
+                    next = other.next;
+                    data = std::move(other.data);
+                    other.previous = other.next = nullptr;
+               }
+               return *this;
           }
           void attach_next(dl_node<T> *next_node){
                if (not next_node) return;

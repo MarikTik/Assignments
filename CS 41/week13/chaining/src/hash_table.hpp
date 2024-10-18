@@ -227,7 +227,7 @@ namespace ds{
                const_iterator find(const Key &key) const{
                     size_t index = Hash{}(key) % _table.capacity();
 
-                    if (not _table.contains_index(index)) return cend();
+                    if (not _table.is_used_at(index)) return cend();
 
                     const chain_t &chain = _table.at(index);
 
@@ -243,7 +243,7 @@ namespace ds{
                /// @return iterator to the key-value pair if it was found, end() otherwise.
                iterator find(const Key &key){
                     size_t index = Hash{}(key) % _table.capacity();
-                    if (not _table.contains_index(index)) return end();
+                    if (not _table.is_used_at(index)) return end();
 
                     chain_t &chain = _table.at(index);
 
@@ -260,7 +260,7 @@ namespace ds{
                bool contains(const Key &key) const{
                     auto index = Hash{}(key) % _table.capacity();
 
-                    if (not _table.contains_index(index)) return false;
+                    if (not _table.is_used_at(index)) return false;
 
                     const auto &chain = _table.at(index);
 
@@ -275,26 +275,40 @@ namespace ds{
                }
                
                /// @brief Returns whether the hash table is empty.
-               /// @note This function has linear complexity.
+               /// @note This function has linear complexity or potentially quadratic.
                bool empty() const{
-                    return size() not_eq 0;
+                    return not size();
                }
                
                /// @brief Returns the number of elements in the hash table.
-               /// @note This function has linear complexity or potentially quadratick.
-               size_t size(){
+               /// @note This function has linear complexity or potentially quadratic.
+               size_t size() const{
                     size_t count = 0;
-                    for (auto &chain : _table) count += chain.size();
+                    for (const auto &chain : _table) count += chain.size();
                     return count;     
                }
 
+               /// @brief Returns an iterator to the beginning of the hash table.
                iterator begin() { return iterator{_table.begin(), _table.end()}; }
+               
+               /// @brief Returns an iterator to the end of the hash table.
                iterator end() { return iterator{_table.end(), _table.end()}; }
+
+               /// @brief Returns a const iterator to the beginning of the hash table.
                const_iterator cbegin() const { return const_iterator{_table.begin(), _table.end()}; }
+
+               /// @brief Returns a const iterator to the end of the hash table.
                const_iterator cend() const { return const_iterator{_table.end(), _table.end()}; }
+
+               /// @brief Returns a const iterator to the beginning of the hash table.
+               /// @note This function is provided for compatibility with the standard library. Use cbegin() instead.
                const_iterator begin() const { return cbegin(); }
+
+               /// @brief Returns a const iterator to the end of the hash table.
+               /// @note This function is provided for compatibility with the standard library. Use cend() instead.
                const_iterator end() const { return cend(); }
-           
+
+               
                void rehash(size_t new_capacity){
                     if (new_capacity <= _table.capacity()) return;
                     unordered_list<chain_t, chain_allocator_t> new_table(new_capacity);
@@ -308,15 +322,18 @@ namespace ds{
                     _table = std::move(new_table);
                }
 
+               /// @brief Reserves the specified capacity for the hash table.
+               /// @param new_capacity The new capacity to reserve. 
                void reserve(size_t new_capacity){
                     rehash(new_capacity);
                }
 
+               /// @brief Sets the maximum load factor of the hash table.
                void max_load_factor(float factor){
                     _max_load_factor = factor;
                }
 
-
+               /// @brief Clears the hash table and releases memory.
                void clear(){
                     _table.clear();
                }
