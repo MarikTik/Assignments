@@ -13,7 +13,7 @@ class Cookie{
  
 
     public BitableCookie show(int chockolateChips){
-        double offset = 3;
+        double offset = radius / 30.0; // this is an arbitrary choice
         screen.setPenColor(cookieBorderColor);
         screen.filledCircle(xCenter, yCenter, radius);
         screen.setPenColor(cookieFillColor);
