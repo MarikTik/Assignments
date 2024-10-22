@@ -24,13 +24,10 @@ public class Program {
         try{
             var students = Student.fromFile("week8/lecture2/data.txt");
            
-
             Student topStudent = students.stream().reduce(
                 new Student("0", 0, 0.0, "Invalid"),    
-            (student1, student2) ->
-                student1.GPA > student2.GPA ? student1 : student2
+                (student1, student2) -> student1.GPA > student2.GPA ? student1 : student2
             );
-
             
             double averageGPA = students.stream()
                 .map(student -> student.GPA)
@@ -38,8 +35,6 @@ public class Program {
 
             System.out.println(topStudent);
             System.out.println(averageGPA);
-            
-
         }
         catch(IOException ex){
             System.out.println(ex.getMessage());
