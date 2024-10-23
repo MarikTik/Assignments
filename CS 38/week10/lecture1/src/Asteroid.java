@@ -8,12 +8,9 @@ public class Asteroid {
     }
 
     public void show(double x, double y){
-        File file = new File("week10/lecture1/assets/asteroid3.png");
-        if (file.exists()){
-            System.out.println("exists");
-        }
-        else System.out.println("doesn't exist");
-        screen.picture(x, y, "week10/lecture1/assets/asteroid3.png", width, height);
+       
+    
+        screen.picture(x, y, "assets/asteroids/large/a10000.png", width, height);
     }
 
     private Draw screen;
