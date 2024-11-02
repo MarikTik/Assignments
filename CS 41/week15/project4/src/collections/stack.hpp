@@ -1,6 +1,6 @@
 #ifndef STACK_HPP
 #define STACK_HPP
-#include "../utils/sl_node.hpp"
+#include "sl_node.hpp"
 #include <memory>
 
 

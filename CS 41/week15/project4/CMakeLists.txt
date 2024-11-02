@@ -1,9 +1,11 @@
 set(SRC_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src)
 set(TEST_DIR ${CMAKE_CURRENT_SOURCE_DIR}/tests)
 
-add_subdirectory(tests)
-
+# add_subdirectory(tests)
 project(borg)
+add_executable(${PROJECT_NAME} ${SRC_DIR}/main.cpp ${SRC_FILES})
+
+
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_FLAGS_DEBUG "-O0 -g")
 
@@ -16,15 +18,15 @@ include_directories(${SRC_DIR}/interpreter/expressions)
 
 file(
      GLOB SRC_FILES 
-     ${SRC_DIR}/*.cpp
+    #  ${SRC_DIR}/*.cpp
      ${SRC_DIR}/collections/*.cpp
-     ${SRC_DIR}/parser/*.cpp
-     ${SRC_DIR}/utils/*.cpp
-     ${SRC_DIR}/interpreter/*.cpp
-     ${SRC_DIR}/interpreter/expressions/*.cpp
+    #  ${SRC_DIR}/parser/*.cpp
+    #  ${SRC_DIR}/utils/*.cpp
+    #  ${SRC_DIR}/interpreter/*.cpp
+    #  ${SRC_DIR}/interpreter/expressions/*.cpp
 )
 
-add_executable(${PROJECT_NAME} ${SRC_DIR}/main.cpp ${SRC_FILES})
+ 
 
 
 target_compile_options(${PROJECT_NAME} PRIVATE 

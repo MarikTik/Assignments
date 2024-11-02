@@ -76,6 +76,7 @@
           "csignal": "cpp",
           "any": "cpp",
           "codecvt": "cpp",
-          "future": "cpp"
+          "future": "cpp",
+          "hash_set": "cpp"
      }
 }

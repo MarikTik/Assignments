@@ -42,12 +42,14 @@ const ds::ordered_list<token> scanner::tokens()
 {
      ds::ordered_list<token> tokens;
      std::string line;
-     auto current = _state.start;
      while(std::getline(_source, line)){
           _state.start = _state.current = line.cbegin();
           _state.end = line.cend();
+
+          while(_state.current != _state.end){
+               tokens.push_back(next_token(_state.current, _state.end, _state.line));
+          }
           _state.line++;
- 
      }
      
      tokens.push_back(token(token_type::END, "", "", 0));
