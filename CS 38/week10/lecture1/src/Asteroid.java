@@ -8,11 +8,10 @@ public class Asteroid {
     }
 
     public void show(double x, double y){
-       
-    
         screen.picture(x, y, "assets/asteroids/large/a10000.png", width, height);
     }
 
     private Draw screen;
     private int width, height;
 }
+

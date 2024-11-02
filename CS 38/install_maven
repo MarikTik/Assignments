@@ -1,0 +1,15 @@
+#!/usr/bin/bash
+
+if grep -qi 'fedora' /etc/os-release; then
+    echo "Installing Maven on Fedora"
+    sudo dnf check-update
+    sudo dnf install maven -y
+
+elif grep -qu 'ubuntu' /etc/os-release; then
+    echo "Installing Maven on Ubuntu"
+    sudo apt update
+    sudo apt install maven -y
+
+else 
+    echo "Unknown OS, can't install Maven"
+fi

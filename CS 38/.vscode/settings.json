@@ -4,5 +4,9 @@
             "lib/**/*.jar",
             "*/lib/*.java"
         ]
-    }
+    },
+    "java.project.sourcePaths": [
+        "week10/lecture1/src",
+        "week10/lecture1/lib"
+    ]
 }
