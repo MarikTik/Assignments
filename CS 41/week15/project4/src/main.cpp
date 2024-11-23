@@ -725,8 +725,7 @@ namespace ds{
 
 #ifndef UNORDERED_LIST_HPP
 #define UNORDERED_LIST_HPP
-#include "ordered_list.hpp"
-#include "index_set.hpp"
+
 #include <type_traits>
 #include <memory>
 
@@ -990,7 +989,7 @@ namespace ds{
 
 #ifndef STACK_HPP
 #define STACK_HPP
-#include "sl_node.hpp"
+
 #include <memory>
 
 
@@ -1093,8 +1092,6 @@ class stack{
 
 #ifndef HASH_TABLE_HPP
 #define HASH_TABLE_HPP
-#include "unordered_list.hpp"
-#include "linked_list.hpp"
 #include <type_traits>
 #include <algorithm>
 

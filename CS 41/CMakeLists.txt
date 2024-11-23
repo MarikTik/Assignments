@@ -1,10 +1,10 @@
 cmake_minimum_required(VERSION 3.22.1)
 project(proj_tester)
 
-set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
-add_executable(proj main.cpp)
-# add_executable(${PROJECT_NAME} week10/exam3/src/main.cpp)
+add_executable(${PROJECT_NAME} week15/project4/src/main.cpp)
+
 # target_compile_options(${PROJECT_NAME} PRIVATE 
 #     -Wall
 #     -Wextra
