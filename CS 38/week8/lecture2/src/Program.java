@@ -3,13 +3,7 @@ import java.io.IOException;
 import java.util.Scanner;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
-/**
- * Description
- * class with all the required methods for the current lecture 
- * 
- * @author Mark Tikhonov
- * @version 0.0.1
- */
+av
 public class Program {
     public static void readFileBasic() throws IOException{
         File file = new File("week8/lecture2/data.txt");
