@@ -18,6 +18,9 @@ public class ThreeDiceMT {
         return 0;
     }
 
+    public int diceSum(){
+        return dice[0] + dice[1] + dice[2];
+    }
     public void setDice(int n, int newValue){
         if (1 <= n && n <= 3 && 1 <= newValue && newValue <= 6)
             dice[n - 1] = newValue;
@@ -38,20 +41,6 @@ public class ThreeDiceMT {
         System.out.println(toString());
     }
 
-    public static void demo(){
-        ThreeDiceMT dice = new ThreeDiceMT();
-        int []score = new int[20];
-        dice.play(score);
-    }
-
-    private void printArray(int array[]){
-        for (int i = 0; i < array.length; i++){
-            System.out.print(array[i]);
-            if ((i + 1) % 5 == 0)
-                System.out.print(" - ");
-        }
-        System.out.println();
-    }
     private int sum(int []arr){
         int s = 0;
         for (int i : arr) s+=i;
