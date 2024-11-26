@@ -5,27 +5,57 @@ public class ThreeDiceMT {
         for (int i = 0; i < dice.length; i++)
             dice[i] = rand.nextInt(1, 7);
     }
-    public ThreeDiceMT(int m, int n){
-        if (1 <= m && m >=6 && 1 <= n && n <= 6){
-            // idk what the reqs mean
-        }
+    public ThreeDiceMT(int k, int m, int n){
+        setDice(1, k);
+        setDice(2, m);
+        setDice(3, n);
     }
     public int getDice(int n){
         if (1 <= n && n <= 3)
-            return dice[n];
+            return dice[n - 1];
         if (n == 0)
             return sum(dice);
         return 0;
     }
 
     public void setDice(int n, int newValue){
-        
+        if (1 <= n && n <= 3 && 1 <= newValue && newValue <= 6)
+            dice[n - 1] = newValue;
     }
 
+    public void roll(){
+        for (int i = 0; i < dice.length; i++)
+            dice[i] = rand.nextInt(1, 7);
+    }
+    public String toString(){
+        String s = "";
+        for (int i : dice)
+            s += i;
+        return s;
+    }
+
+    public void printMe(){
+        System.out.println(toString());
+    }
+
+    public static void demo(){
+        ThreeDiceMT dice = new ThreeDiceMT();
+        int []score = new int[20];
+        dice.play(score);
+    }
+
+    private void printArray(int array[]){
+        for (int i = 0; i < array.length; i++){
+            System.out.print(array[i]);
+            if ((i + 1) % 5 == 0)
+                System.out.print(" - ");
+        }
+        System.out.println();
+    }
     private int sum(int []arr){
         int s = 0;
         for (int i : arr) s+=i;
-        return 0;
+        return s;
     }
 
     private Random rand = new Random();
