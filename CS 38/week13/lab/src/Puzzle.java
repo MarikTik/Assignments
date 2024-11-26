@@ -1,34 +1,44 @@
 import java.util.Random;
 
 public class Puzzle {
-    Puzzle(){
+    public Puzzle(){
         table.fill(0);
     }
-    public void randomFill(){
+    public FillInfo randomFill(){
         for (int i = 0 ; i < 2; i ++)
             for (int j = 0; j < 2; j++)
                 table.set(i, j, randTwoDigit());
         
         table.set(0, 2, randTwoDigit());                
         int targetSum = rowSum(table, 0);     
-        System.out.println(targetSum);   
-        // table.set(1, 2, randTwoDigit());
-        // table.set(2, 0, randTwoDigit());
-        // table.set(2, 1, randTwoDigit());
-        // table.set(2, 2, randTwoDigit());
-        System.out.println("found 0");
-        while(rowSum(table, 1) != targetSum) table.set(1, 2, randTwoDigit());
-        System.out.println("found 1");
-        while(colSum(table, 0) != targetSum) table.set(2, 0, randTwoDigit());
-        System.out.println("found 2");
-        while(colSum(table, 1) != targetSum) table.set(2, 1, randTwoDigit());
-        System.out.println("found 3");
-        while(colSum(table, 2) != targetSum && rowSum(table, 2) != targetSum) table.set(2, 2, randTwoDigit());  
-        System.out.println("found 4");
+        
+        long iterations = 0;
+        while(rowSum(table, 1) != targetSum) {
+            iterations++;
+            table.set(1, 2, randTwoDigit());
+        }
+            
+  
+        while(colSum(table, 0) != targetSum) {
+            iterations++;
+            table.set(2, 0, randTwoDigit());
+        }
+
+        while(colSum(table, 1) != targetSum) {
+            iterations++;
+            table.set(2,1 , randTwoDigit());
+        }
+    
+        while(colSum(table, 2) != targetSum && rowSum(table, 2) != targetSum){
+            iterations++;
+            table.set(2, 2, randTwoDigit());
+        }
+        
         // _ _ _
         // _ _ -
         // - - *
         
+        return new FillInfo(table, iterations, targetSum);
     }
 
  
@@ -69,9 +79,29 @@ public class Puzzle {
     public static void demo(){
         var screen = Form.defaultForm();
         var puzzle = new Puzzle();
-        puzzle.randomFill();
+        System.out.print(puzzle.randomFill());
         puzzle.display(screen, 400, 400);
     }
     private Matrix2D<Integer> table = new Matrix2D<>(3, 3); 
     private static Random rand = new Random();
+
+    private static class FillInfo{
+        public FillInfo(Matrix2D<Integer> table, long iterations, int targetSum){
+            this.iterations = iterations;
+            this.targetSum = targetSum;
+            this.table = table;
+        }
+        public String toString(){
+            return String.format(
+                "try #%d: Mark Tikhonov FOUND A SOLUTION=====\n%s\n\nRow sum: %d\nColSum: %d\n",
+                iterations,
+                table,
+                targetSum,
+                targetSum
+            );
+        }
+        private Matrix2D<Integer> table;
+        private long iterations;
+        private int targetSum;
+    }
 }
